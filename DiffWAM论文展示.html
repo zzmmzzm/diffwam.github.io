@@ -395,45 +395,31 @@ pre.bib .c{color:#7C8DB0}
 
     <div class="figure-card wide reveal">
       <img src="assets/DiffWAM_Pipeline.pdf.png" alt="DiffWAM 总体流程图：视觉语言输入、预测到运动解码、连续3D运动输出、两阶段训练">
-      <p class="fig-cap"><b>DiffWAM 总体流程。</b> 初始 RGB 观测与语言指令条件化冻结视频模型；一次截断前向产生预测特征，经 Grid-Motion 与几何条件的 Latent2Pose 解码为相机轨迹提议；首帧几何提供观测空间参考与估计尺度。训练区分视频骨干蒸馏 S0 与两个运动读出阶段：导航感知预训练 S1、几何引导的同源 rollout 配对蒸馏 S2（OPD）。完整视频生成与重建仅用于离线教师。<span class="src">（图 1 · DiffWAM_Pipeline）</span></p>
+      <p class="fig-cap"><b>DiffWAM 总体流程。</b> 初始 RGB 观测与语言指令条件化一个冻结视频模型；一次截断前向得到预测特征，由 Grid-Motion 与几何条件 Latent2Pose 解码为相机轨迹提议，首帧几何提供空间参考与尺度。完整视频生成与重建只用于离线教师（S0&ndash;S2）。<span class="src">（图 1 · DiffWAM_Pipeline）</span></p>
     </div>
 
-    <div class="mm-grid" style="margin-top:22px">
+        <div class="mm-grid" style="margin-top:22px">
       <div class="mm-card reveal">
-        <h4><span class="chip">τ̂</span>问题定义</h4>
-        <p>五秒时域内的未来轨迹表示为 38 个相机位姿（朝向 + 位置），均表达在初始相机坐标系下；前置初始单位位姿后共 39 个位姿。位姿是运动提议而非已认证的无碰撞指令，时间插值与可执行轨迹构建由下游执行系统完成。</p>
-        <div class="formula-box"><div class="fl">TRAJECTORY</div><div class="eq-scroll">$$\hat{\tau}=\{(\hat{R}_t,\hat{p}_t)\}_{t=1}^{T},\quad T=38,\ \hat{R}_t\in\mathrm{SO}(3),\ \hat{p}_t\in\mathbb{R}^3$$</div></div>
+        <h4><span class="chip">τ&#770;</span>问题定义</h4>
+        <p>五秒时域表示为<b> 38 个相机位姿</b>（姿态 + 位置），表达在初始相机坐标系；加上单位初始位姿共 39 个。位姿是从生成器预测状态解码出的运动提议，而非经过碰撞校验的可执行指令 &mdash; 插值与可执行轨迹构建由下游执行模块完成。</p>
       </div>
       <div class="mm-card reveal">
-        <h4><span class="chip">ℰ</span>单次前向预测状态</h4>
-        <p>不完成 H3 的迭代生成调度：一次截断调用同时产生预测表征 Z 与干净观测锚点 A₀（含原生逐 token 时间步分配）。冻结几何估计器从同一初始图像提取首帧几何 G₀，运动读出接口 D<sub>θ</sub> 据此预测轨迹。</p>
-        <div class="formula-box"><div class="fl">PREDICTIVE STATE</div><div class="eq-scroll">$$(Z,A_0)=\mathcal{E}_{\psi}(I_0,c,\epsilon_v;\mathcal{S}_0),\quad G_0=\mathcal{G}_{\eta}(I_0),\quad \hat{\tau}=\mathcal{D}_{\theta}(Z,A_0,G_0)$$</div></div>
+        <h4><span class="chip">&#8464;</span>高效的预测读出</h4>
+        <p>生成器的迭代生成流程<b>从不完整执行</b>：一次截断前向即返回多层预测特征（层 15 / 25 / 35，5,376 &rarr; 512 维）与干净观测锚点，同时冻结的几何估计器（MoGe2）从同一张初始图像读出首帧几何。部署阶段无需未来视频解码，也无需多帧几何重建。</p>
       </div>
       <div class="mm-card reveal">
-        <h4><span class="chip">F</span>多层特征读取与融合</h4>
-        <p>在第 15 / 25 / 35 层提取完整通道特征（L=3，C=5,376），逐层归一化并投影到 512 维，softmax 权重融合后再经四个冻结的分解式时空 Transformer 模块处理。空间池化严格放在 Grid-Motion 之后，保证关联算子能访问未池化的空间布局。</p>
-        <div class="formula-box"><div class="fl">LAYER FUSION</div><div class="eq-scroll">$$F^{\mathrm{fuse}}=\sum_{\ell=1}^{L}\omega_{\ell}\,\phi_{\ell}(Z_{\ell}),\qquad \omega_{\ell}=\frac{\exp(a_{\ell})}{\sum_k \exp(a_k)}$$</div></div>
+        <h4><span class="chip">M</span>Grid-Motion 与 Latent2Pose</h4>
+        <p>Grid-Motion 在池化前建立带时间戳与几何条件的锚点关联，将<b> 39 个视频时间槽化为 312 个运动记忆 token</b>；Latent2Pose 再结合首帧几何（以有效深度中位数为场景尺度 <i>s</i><sub>0</sub>），用 38 个可学习位姿查询解码出连续、米制尺度的 SE(3) 轨迹。</p>
       </div>
       <div class="mm-card reveal">
-        <h4><span class="chip">M</span>Grid-Motion 关联与运动记忆</h4>
-        <p>两路关联：时序关联从 max(0,t−1) 与 max(0,t−4) 参考网格跨空间检索并取特征差；锚点关联以干净锚点为 key、融合首帧几何为 value。两路消息经可学习门控残差融合，随后学习式池化把 39 个时间槽各映射为 8 个 token，共 312 个运动记忆 token。</p>
-        <div class="formula-box"><div class="fl">GATED RESIDUAL & MEMORY</div><div class="eq-scroll">$$\widetilde{F}_t=F_t+\gamma_t^{\Delta}M_t^{\Delta}+\gamma_t^{A}M_t^{A},\qquad \mathcal{M}\in\mathbb{R}^{312\times512},\ 312=39\times8$$</div></div>
-      </div>
-      <div class="mm-card reveal">
-        <h4><span class="chip">R</span>几何引导的轨迹解码</h4>
-        <p>MoGe2 几何转换为 8×14 网格（signed-log XYZ、法向、log 深度、有效性），有效深度中位数经截断得到场景尺度 s₀。解码器含 38 个可学习位姿 query 与 8 个 Transformer 解码块；位置头输出乘 s₀，旋转头输出六维表征并经 Gram–Schmidt 正交化。</p>
-        <div class="formula-box"><div class="fl">METRIC HEAD</div><div class="eq-scroll">$$\hat{p}_t=s_0\,(W_p q_t+b_p),\qquad \hat{R}_t=\mathrm{GS}(W_R q_t+b_R)$$</div></div>
-      </div>
-      <div class="mm-card reveal">
-        <h4><span class="chip">L</span>蒸馏目标</h4>
-        <p>教师把同一次完整生成视频经 Pi3 重建、MoGe2 深度定标（有效深度 0.5–30 m 的中位数比值 α）得到估计米制轨迹；学生只用早期特征与首帧几何。两项损失：尺度归一化的鲁棒位置损失 + SO(3) 测地角平方旋转损失，所有未来时间戳等权。</p>
-        <div class="formula-box"><div class="fl">OBJECTIVE</div><div class="eq-scroll">$$\mathcal{L}=\mathcal{L}_{\mathrm{pos}}+\lambda_R\,\mathcal{L}_{\mathrm{rot}},\qquad d_{\mathrm{SO}(3)}=\arccos\!\left(\mathrm{clip}\!\left(\tfrac{\mathrm{tr}(R_1^{\top}R_2)-1}{2},-1,1\right)\right)$$</div></div>
+        <h4><span class="chip">L</span>几何引导蒸馏</h4>
+        <p>训练是非对称的：离线教师重建<b>完整生成视频</b>（Pi3）并用 MoGe2 深度标定尺度；学生只看到早期特征与首帧几何。尺度归一化的位置损失加上 SO(3) 测地旋转损失训练读出器 &mdash; 完整视频生成与重建始终留在部署路径之外。</p>
       </div>
     </div>
 
     <div class="figure-card wide reveal" style="margin-top:22px">
       <img src="assets/DiffWAM_Internal_model_architecture.pdf.png" alt="DiffWAM 内部模型架构：多层特征、时空分解、Grid-Motion、轨迹解码器与离线教师">
-      <p class="fig-cap"><b>DiffWAM 内部架构。</b> 第 15 / 25 / 35 层特征从 5,376 维投影融合，经冻结的分解式时空模块；可训练 Grid-Motion 建立时序与几何条件化锚点关联后进入记忆池化；39 个视频时间槽产生 312 个运动记忆 token。直接解码器含 38 个未来位姿 query、8 个 Transformer 块，位置 / 旋转头输出 38 个未来位姿。离线教师用 Pi3 重建完整视频，并以 MoGe2 估计校准尺度。<span class="src">（图 2 · DiffWAM_Internal_model_architecture）</span></p>
+      <p class="fig-cap"><b>DiffWAM 内部架构。</b> 多层预测特征（层 15 / 25 / 35，5,376 &rarr; 512 维）融合后经分解时空模块处理；Grid-Motion 建立几何条件关联，再将 39 个视频时间槽池化为 312 个运动记忆 token；直接解码器以位置 / 旋转头输出 38 个未来位姿。离线教师重建完整视频（Pi3）并用 MoGe2 标定尺度。<span class="src">（图 2 · DiffWAM_Internal_model_architecture）</span></p>
     </div>
   </div>
 </section>
@@ -789,9 +775,9 @@ pre.bib .c{color:#7C8DB0}
         <p style="font-size:13px;line-height:1.8">A Fast and Efficient Navigation World Action Model —— 本页数据、图表与结论均直接取自论文源稿 template.tex 及其附图。</p>
       </div>
       <div class="refs">
-        <h5>文中相关方法（arXiv 索引）</h5>
+                <h5>相关方法</h5>
         <div>
-          <a href="https://arxiv.org/abs/2605.15964">WorldVLN · 2605.15964</a> · <a href="https://arxiv.org/abs/2606.01205">ImagineUAV · 2606.01205</a> · <a href="https://arxiv.org/abs/2603.16666">Fast-WAM · 2603.16666</a> · <a href="https://arxiv.org/abs/2608.04404">Faster-WAM · 2608.04404</a> · <a href="https://arxiv.org/abs/2507.13347">π³ · 2507.13347</a> · <a href="https://arxiv.org/abs/2507.02546">MoGe-2 · 2507.02546</a> · <a href="https://arxiv.org/abs/2303.04137">Diffusion Policy · 2303.04137</a> · <a href="https://arxiv.org/abs/2506.07339">RTC · 2506.07339</a> · <a href="https://arxiv.org/abs/2602.13476">AsyncVLA · 2602.13476</a> · <a href="https://arxiv.org/abs/2604.24086">AsyncShield · 2604.24086</a> · <a href="https://arxiv.org/abs/2008.08835">EGO-Planner · 2008.08835</a> · <a href="https://arxiv.org/abs/2512.15258">VLA-AN · 2512.15258</a>
+          <a href="https://arxiv.org/abs/2602.09765">NavDreamer · 2602.09765</a> · <a href="https://arxiv.org/abs/2008.08835">EGO-Planner · 2008.08835</a>
         </div>
       </div>
     </div>

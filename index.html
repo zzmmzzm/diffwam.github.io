@@ -385,45 +385,31 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
 
     <div class="figure-card wide reveal">
       <img src="assets/DiffWAM_Pipeline.pdf.png" alt="DiffWAM overview: vision-language inputs, predictive-to-motion decoding, continuous 3D motion output, two-stage training">
-      <p class="fig-cap"><b>DiffWAM overview.</b> Initial RGB observation and language instruction condition a frozen video model; a single truncated forward yields predictive features, decoded by Grid-Motion and the geometry-conditioned Latent2Pose into a camera-trajectory proposal; first-frame geometry provides spatial reference and estimated scale. Training separates video-backbone distillation S0 from two motion-readout stages: navigation-aware pretraining S1 and geometry-guided same-rollout pairing distillation S2 (OPD). Full video generation and reconstruction are used only by the offline teacher.<span class="src"> (Fig. 1 · DiffWAM_Pipeline)</span></p>
+      <p class="fig-cap"><b>DiffWAM overview.</b> An initial RGB observation and a language instruction condition a frozen video model; one truncated forward yields predictive features, decoded by Grid-Motion and the geometry-conditioned Latent2Pose into a camera-trajectory proposal, with first-frame geometry providing spatial reference and scale. Full video generation and reconstruction are used only by the offline teacher (S0&ndash;S2).<span class="src"> (Fig. 1 · DiffWAM_Pipeline)</span></p>
     </div>
 
-    <div class="mm-grid" style="margin-top:22px">
+        <div class="mm-grid" style="margin-top:22px">
       <div class="mm-card reveal">
-        <h4><span class="chip">τ̂</span>Problem formulation</h4>
-        <p>The future trajectory over a five-second horizon is represented as 38 camera poses (orientation + position), each expressed in the initial-camera frame; prepending the identity initial pose gives 39 poses. Poses are motion proposals, not verified collision-free commands; temporal interpolation and executable-trajectory construction are left to downstream execution.</p>
-        <div class="formula-box"><div class="fl">TRAJECTORY</div><div class="eq-scroll">$$\hat{\tau}=\{(\hat{R}_t,\hat{p}_t)\}_{t=1}^{T},\quad T=38,\ \hat{R}_t\in\mathrm{SO}(3),\ \hat{p}_t\in\mathbb{R}^3$$</div></div>
+        <h4><span class="chip">τ&#770;</span>Problem formulation</h4>
+        <p>The five-second horizon is represented as <b>38 camera poses</b> (orientation + position) in the initial-camera frame; with the identity initial pose, 39 poses in total. Poses are motion proposals decoded from the generator&rsquo;s predictive state, not verified collision-free commands &mdash; interpolation and executable-trajectory construction are left to downstream execution.</p>
       </div>
       <div class="mm-card reveal">
-        <h4><span class="chip">ℰ</span>Single-forward predictive state</h4>
-        <p>H3's iterative generation schedule is not completed: a single truncated call yields both the predictive representation Z and clean-observation anchors A₀ (with native per-token time steps). A frozen geometry estimator extracts first-frame geometry G₀ from the same initial image, and the motion-readout interface D<sub>θ</sub> predicts the trajectory.</p>
-        <div class="formula-box"><div class="fl">PREDICTIVE STATE</div><div class="eq-scroll">$$(Z,A_0)=\mathcal{E}_{\psi}(I_0,c,\epsilon_v;\mathcal{S}_0),\quad G_0=\mathcal{G}_{\eta}(I_0),\quad \hat{\tau}=\mathcal{D}_{\theta}(Z,A_0,G_0)$$</div></div>
+        <h4><span class="chip">&#8464;</span>Efficient predictive readout</h4>
+        <p>The generator&rsquo;s iterative generation schedule is <b>never completed</b>: one truncated call returns multi-level predictive features (layers 15 / 25 / 35, 5,376 &rarr; 512 dims) and clean-observation anchors, while a frozen geometry estimator (MoGe2) reads first-frame geometry from the same initial image. Deployment needs no future-video decoding and no multi-frame reconstruction.</p>
       </div>
       <div class="mm-card reveal">
-        <h4><span class="chip">F</span>Multi-level feature readout and fusion</h4>
-        <p>Full-channel features are extracted at layers 15 / 25 / 35 (L=3, C=5,376), layer-normalized and projected to 512 dims, fused with softmax weights, then processed by four frozen factorized spatiotemporal Transformer blocks. Spatial pooling is placed strictly after Grid-Motion so association operators can access the unpooled spatial layout.</p>
-        <div class="formula-box"><div class="fl">LAYER FUSION</div><div class="eq-scroll">$$F^{\mathrm{fuse}}=\sum_{\ell=1}^{L}\omega_{\ell}\,\phi_{\ell}(Z_{\ell}),\qquad \omega_{\ell}=\frac{\exp(a_{\ell})}{\sum_k \exp(a_k)}$$</div></div>
+        <h4><span class="chip">M</span>Grid-Motion &amp; Latent2Pose</h4>
+        <p>Grid-Motion builds timestamp- and geometry-conditioned anchor associations before pooling, turning <b>39 video-time slots into 312 motion-memory tokens</b>. Latent2Pose then combines this memory with first-frame geometry (scene scale <i>s</i><sub>0</sub> from the median valid depth) and decodes a continuous, metrically scaled SE(3) trajectory with 38 learned pose queries.</p>
       </div>
       <div class="mm-card reveal">
-        <h4><span class="chip">M</span>Grid-Motion association and motion memory</h4>
-        <p>Two association pathways: temporal association retrieves feature differences across space from reference grids at max(0, t−1) and max(0, t−4); anchor association keys clean anchors against fused first-frame geometry values. The two messages are combined by a learned gated residual, then learned pooling maps each of the 39 video-time slots to 8 tokens — 312 motion-memory tokens in total.</p>
-        <div class="formula-box"><div class="fl">GATED RESIDUAL &amp; MEMORY</div><div class="eq-scroll">$$\widetilde{F}_t=F_t+\gamma_t^{\Delta}M_t^{\Delta}+\gamma_t^{A}M_t^{A},\qquad \mathcal{M}\in\mathbb{R}^{312\times512},\ 312=39\times8$$</div></div>
-      </div>
-      <div class="mm-card reveal">
-        <h4><span class="chip">R</span>Geometry-guided trajectory decoding</h4>
-        <p>MoGe2 geometry is converted to an 8×14 grid (signed-log XYZ, normals, log depth, validity); the truncated median of valid depths yields scene scale s₀. The decoder holds 38 learned pose queries and 8 Transformer decoder blocks; the position head outputs s₀-scaled positions and the rotation head outputs 6-D representations orthonormalized by Gram–Schmidt.</p>
-        <div class="formula-box"><div class="fl">METRIC HEAD</div><div class="eq-scroll">$$\hat{p}_t=s_0\,(W_p q_t+b_p),\qquad \hat{R}_t=\mathrm{GS}(W_R q_t+b_R)$$</div></div>
-      </div>
-      <div class="mm-card reveal">
-        <h4><span class="chip">L</span>Distillation objective</h4>
-        <p>The teacher reconstructs the same complete generated video via Pi3 and calibrates scale with MoGe2 depth (median ratio α over valid depths in 0.5–30 m) to obtain estimated metric trajectories; the student uses only early features and first-frame geometry. Two losses: a scale-normalized robust position loss plus a squared SO(3) geodesic rotation loss, equally weighted across all future timestamps.</p>
-        <div class="formula-box"><div class="fl">OBJECTIVE</div><div class="eq-scroll">$$\mathcal{L}=\mathcal{L}_{\mathrm{pos}}+\lambda_R\,\mathcal{L}_{\mathrm{rot}},\qquad d_{\mathrm{SO}(3)}=\arccos\!\left(\mathrm{clip}\!\left(\tfrac{\mathrm{tr}(R_1^{\top}R_2)-1}{2},-1,1\right)\right)$$</div></div>
+        <h4><span class="chip">L</span>Geometry-guided distillation</h4>
+        <p>Training is asymmetric: the offline teacher reconstructs the <b>complete generated video</b> (Pi3) and calibrates scale with MoGe2 depth; the student sees only early features and first-frame geometry. A scale-normalized position loss plus an SO(3) geodesic rotation loss trains the readout &mdash; full video generation and reconstruction stay out of the deployment path.</p>
       </div>
     </div>
 
     <div class="figure-card wide reveal" style="margin-top:22px">
       <img src="assets/DiffWAM_Internal_model_architecture.pdf.png" alt="DiffWAM internal architecture: multi-level features, spatiotemporal factorization, Grid-Motion, trajectory decoder and offline teacher">
-      <p class="fig-cap"><b>DiffWAM internal architecture.</b> Features at layers 15 / 25 / 35 are projected from 5,376 dims and fused, then processed by frozen factorized spatiotemporal modules; trainable Grid-Motion builds timestamp- and geometry-conditioned anchor associations before memory pooling; 39 video-time slots produce 312 motion-memory tokens. The direct decoder holds 38 future-pose queries and 8 Transformer blocks; the position / rotation heads output the 38 future poses. An offline teacher reconstructs complete videos with Pi3 and calibrates scale with MoGe2.<span class="src"> (Fig. 2 · DiffWAM_Internal_model_architecture)</span></p>
+      <p class="fig-cap"><b>DiffWAM internal architecture.</b> Multi-level predictive features (layers 15 / 25 / 35, 5,376 &rarr; 512 dims) are fused and processed by factorized spatiotemporal modules; Grid-Motion builds geometry-conditioned associations before pooling 39 video-time slots into 312 motion-memory tokens; the direct decoder outputs 38 future poses with position / rotation heads. An offline teacher reconstructs complete videos (Pi3) and calibrates scale with MoGe2.<span class="src"> (Fig. 2 · DiffWAM_Internal_model_architecture)</span></p>
     </div>
   </div>
 </section>
@@ -780,9 +766,9 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
         <p style="font-size:13px;line-height:1.8">A Fast and Efficient Navigation World Action Model — this page presents the paper's data, figures and conclusions as directly taken from the manuscript (template.tex) and its figures.</p>
       </div>
       <div class="refs">
-        <h5>Related methods (arXiv indices)</h5>
+                <h5>Related methods</h5>
         <div>
-          <a href="https://arxiv.org/abs/2605.15964">WorldVLN · 2605.15964</a> · <a href="https://arxiv.org/abs/2606.01205">ImagineUAV · 2606.01205</a> · <a href="https://arxiv.org/abs/2603.16666">Fast-WAM · 2603.16666</a> · <a href="https://arxiv.org/abs/2608.04404">Faster-WAM · 2608.04404</a> · <a href="https://arxiv.org/abs/2507.13347">π³ · 2507.13347</a> · <a href="https://arxiv.org/abs/2507.02546">MoGe-2 · 2507.02546</a> · <a href="https://arxiv.org/abs/2303.04137">Diffusion Policy · 2303.04137</a> · <a href="https://arxiv.org/abs/2506.07339">RTC · 2506.07339</a> · <a href="https://arxiv.org/abs/2602.13476">AsyncVLA · 2602.13476</a> · <a href="https://arxiv.org/abs/2604.24086">AsyncShield · 2604.24086</a> · <a href="https://arxiv.org/abs/2008.08835">EGO-Planner · 2008.08835</a> · <a href="https://arxiv.org/abs/2512.15258">VLA-AN · 2512.15258</a>
+          <a href="https://arxiv.org/abs/2602.09765">NavDreamer · 2602.09765</a> · <a href="https://arxiv.org/abs/2008.08835">EGO-Planner · 2008.08835</a>
         </div>
       </div>
     </div>
