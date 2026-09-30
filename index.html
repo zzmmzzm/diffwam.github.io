@@ -70,7 +70,7 @@ section{scroll-margin-top:76px}
 .hero-inner{position:relative;display:grid;grid-template-columns:1.08fr .92fr;gap:56px;align-items:center;padding-bottom:64px}
 .hero-kicker{display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:500;color:var(--on-muted);letter-spacing:.4px}
 .hero-kicker::before{content:"";width:34px;height:2px;background:var(--amber);border-radius:2px}
-.hero h1{font-family:var(--font-d);font-weight:700;font-size:clamp(42px,5.6vw,70px);line-height:1.08;letter-spacing:-.5px;margin:16px 0 6px}
+.hero h1{font-family:var(--font-d);font-weight:700;font-size:clamp(27px,3.2vw,44px);line-height:1.14;letter-spacing:-.3px;margin:14px 0 16px}
 .hero h1 .accent{background:linear-gradient(92deg,#7FB0FF 0%,#4C8DFF 45%,#F2A33C 110%);-webkit-background-clip:text;background-clip:text;color:transparent}
 .hero-sub{font-size:clamp(17px,2vw,21px);font-weight:300;color:var(--on-dark);margin:14px 0 26px;max-width:660px;line-height:1.65}
 .hero-meta{display:flex;flex-wrap:wrap;gap:10px 26px;font-size:14px;color:var(--on-muted);margin-bottom:30px}
@@ -272,11 +272,13 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
   <div class="container hero-inner">
     <div>
       <div class="hero-kicker">World-Action Model · UAV Navigation · Predictive Video Representation</div>
-      <h1>Diff<span class="accent">WAM</span></h1>
-      <p class="hero-sub">A fast and efficient navigation world-action model — recovering the camera motion implied by a generated future directly from the frozen video generator's initial predictive representation, in a single truncated forward.</p>
+      <h1>Diff<span class="accent">WAM</span>: A Fast and Efficient Navigation World Action Model</h1>
       <div class="hero-meta">
-        <span>Authors <b>Mo Zhu et al.</b></span>
+        <span>Authors <b>Mo Zhu<sup>†</sup> · Yuze Wu<sup>†*</sup> · Xijie Huang<sup>†</sup> · Xiao Cui · Weiqi Gai · Xingxing Li · Yuheng Du · Xin Zhou<sup>*</sup> · Fei Gao<sup>*</sup></b></span>
+        <span>Affiliations <b>Zhejiang University · Differential Robotics</b></span>
+        <span>Contacts <b>wuyuze000@zju.edu.cn · iszhouxin@zju.edu.cn · fgaoaa@zju.edu.cn</b></span>
         <span>Keywords <b>World-action models · Trajectory grounding · Geometric distillation</b></span>
+        <span><b>† Equal contribution · * Corresponding author</b></span>
       </div>
       <div class="hero-abstract">
         <p><span class="lead">Core idea:</span> pretrained video models carry rich priors for embodied prediction, but turning their outputs into UAV motion usually requires expensive future-video synthesis and geometric reconstruction. We ask whether the camera motion implied by a generated future can instead be recovered from the frozen generator's initial predictive representation. DiffWAM introduces <b>Latent2Pose</b>, a geometry-conditioned world-action model whose decoder combines multi-level spatiotemporal features with first-image geometry to predict a five-second camera trajectory directly; complete generated videos serve only as offline supervision. The accompanying <b>FastDreamer</b> execution framework hides inference latency inside the execution time of the committed trajectory via single-forward prediction, parallel geometry processing and timestamp-aware asynchronous handoff. The reported results characterize development-set reconstruction agreement; independent navigation success and on-device execution remain to be established.</p>
@@ -616,11 +618,6 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
       </div>
     </div>
 
-    <div class="figure-card wide reveal" style="margin-top:22px">
-      <img src="assets/real_flight_long_horizon.jpg" alt="Long-horizon real navigation: multi-stage task image sequences">
-      <p class="fig-cap"><b>Long-horizon real navigation (multi-stage tasks).</b> Case VII first goes around the left side of the tree on the right, then heads to the yellow mat and lands on it, combining target disambiguation, specified-side bypass, landing-area approach and descent; Case VIII first passes the left side of the electric fan, then reaches in front of the rock formation. Task order is semantically constrained: approaching the rock formation directly cannot satisfy the earlier requirement to pass the specified side of the fan.<span class="src"> (Fig. 6 · real_flight_long_horizon)</span></p>
-    </div>
-
     <div class="case-row">
       <div class="case reveal"><div class="c-no">CASE VII</div><div class="c-name">Around tree left side → land on yellow mat</div><p>Target disambiguation + specified-side bypass + landing-area approach + descent</p></div>
       <div class="case reveal"><div class="c-no">CASE VIII</div><div class="c-name">Around fan left side → reach rock formation</div><p>Switching target reference while preserving unmet task requirements</p></div>
@@ -775,7 +772,7 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
     <div class="sec-head reveal">
       <div class="sec-eyebrow">10 · BIBTEX</div>
       <h2>Cite this work</h2>
-      <p>The manuscript's author block and publication record are not present in the provided source; fields that depend on the published record are marked below.</p>
+      <p>Author list and affiliations are taken from VLA-AN-style.sty (9 authors, Zhejiang University, Differential Robotics); fields that depend on the published record are marked below.</p>
     </div>
     <div class="bib-wrap reveal">
       <div class="bib-head">
@@ -784,13 +781,13 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
       </div>
       <pre class="bib" id="bibCode">@misc{zhu2026diffwam,
   title        = {DiffWAM: A Fast and Efficient Navigation World Action Model},
-  author       = {Zhu, Mo and others},
+  author       = {Zhu, Mo and Wu, Yuze and Huang, Xijie and Cui, Xiao and Gai, Weiqi and Li, Xingxing and Du, Yuheng and Zhou, Xin and Gao, Fei},
   year         = {2026},
   note         = {Preprint}
 }
 <span class="c">% arXiv ID and venue to be filled in from the published record</span></pre>
     </div>
-    <p class="bib-note">Title, author (Mo Zhu et al.) and year are taken from the paper source; add the arXiv ID and venue once the paper is published.</p>
+    <p class="bib-note">Title, full author list and year are taken from the paper source; add the arXiv ID and venue once the paper is published.</p>
   </div>
 </section>
 </main>

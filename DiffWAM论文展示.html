@@ -70,7 +70,7 @@ section{scroll-margin-top:76px}
 .hero-inner{position:relative;display:grid;grid-template-columns:1.08fr .92fr;gap:56px;align-items:center;padding-bottom:64px}
 .hero-kicker{display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:500;color:var(--on-muted);letter-spacing:.4px}
 .hero-kicker::before{content:"";width:34px;height:2px;background:var(--amber);border-radius:2px}
-.hero h1{font-family:var(--font-d);font-weight:700;font-size:clamp(38px,5.2vw,64px);line-height:1.08;letter-spacing:-.5px;margin:16px 0 6px}
+.hero h1{font-family:var(--font-d);font-weight:700;font-size:clamp(27px,3.2vw,44px);line-height:1.14;letter-spacing:-.3px;margin:14px 0 16px}
 .hero h1 .accent{background:linear-gradient(92deg,#7FB0FF 0%,#4C8DFF 45%,#F2A33C 110%);-webkit-background-clip:text;background-clip:text;color:transparent}
 .hero-sub{font-size:clamp(17px,2vw,21px);font-weight:300;color:var(--on-dark);margin:14px 0 26px;max-width:620px;line-height:1.65}
 .hero-meta{display:flex;flex-wrap:wrap;gap:10px 26px;font-size:14px;color:var(--on-muted);margin-bottom:30px}
@@ -282,11 +282,13 @@ pre.bib .c{color:#7C8DB0}
   <div class="container hero-inner">
     <div>
       <div class="hero-kicker">World-Action Model · UAV Navigation · Predictive Video Representation</div>
-      <h1>Diff<span class="accent">WAM</span></h1>
-      <p class="hero-sub">A Fast and Efficient Navigation World Action Model —— 探究能否从冻结生成器的初始预测表征中直接恢复生成未来所隐含的相机运动：一次截断前向，直接解码五秒连续相机轨迹。</p>
+      <h1>Diff<span class="accent">WAM</span>: A Fast and Efficient Navigation World Action Model</h1>
       <div class="hero-meta">
-        <span>作者 <b>Mo Zhu et al.</b></span>
+        <span>作者 <b>Mo Zhu<sup>†</sup> · Yuze Wu<sup>†*</sup> · Xijie Huang<sup>†</sup> · Xiao Cui · Weiqi Gai · Xingxing Li · Yuheng Du · Xin Zhou<sup>*</sup> · Fei Gao<sup>*</sup></b></span>
+        <span>机构 <b>浙江大学 · 微分智飞</b></span>
+        <span>联系 <b>wuyuze000@zju.edu.cn · iszhouxin@zju.edu.cn · fgaoaa@zju.edu.cn</b></span>
         <span>关键词 <b>World-action models · Trajectory grounding · Geometric distillation</b></span>
+        <span><b>† 共同一作 · * 通讯作者</b></span>
       </div>
       <div class="hero-abstract">
         <p><span class="lead">核心思路：</span>预训练视频模型富含具身预测先验，但把输出变成无人机运动通常需要昂贵的未来视频合成与几何重建。我们探究：生成未来所隐含的相机运动，能否直接从冻结生成器的<b>初始预测表征</b>中恢复？DiffWAM 用 <b>Latent2Pose</b> 解码器结合多层时空特征与首帧几何，一次截断前向直接输出五秒相机轨迹；完整生成的视频只作为<b>离线教师</b>提供重建监督。配套的 <b>FastDreamer</b> 执行框架用单次前向预测、并行几何处理与带时间戳的异步交接，把推理延迟藏进已提交轨迹的执行时间里。报告结果表征开发集重建一致性；独立导航成功率与端侧执行仍有待验证。</p>
@@ -627,11 +629,6 @@ pre.bib .c{color:#7C8DB0}
       </div>
     </div>
 
-    <div class="figure-card wide reveal" style="margin-top:22px">
-      <img src="assets/real_flight_long_horizon.jpg" alt="长时域真实导航：多阶段任务图像序列">
-      <p class="fig-cap"><b>长时域真实导航（多阶段任务）。</b> 案例 VII 先绕过右侧树木左侧，再前往黄色垫子并降落，组合了目标消歧、指定侧绕行、降落区域接近与下降；案例 VIII 先从电风扇左侧绕过，再到达假山前方。任务顺序具有语义约束：直接接近假山并不能满足此前从风扇指定侧绕过的要求。<span class="src">（图 6 · real_flight_long_horizon）</span></p>
-    </div>
-
     <div class="case-row">
       <div class="case reveal"><div class="c-no">CASE VII</div><div class="c-name">绕树左侧 → 降落黄色垫子</div><p>目标消歧 + 指定侧绕行 + 降落区域接近 + 下降</p></div>
       <div class="case reveal"><div class="c-no">CASE VIII</div><div class="c-name">绕风扇左侧 → 抵达假山前方</div><p>切换目标参照物，保留未完成的任务要求</p></div>
@@ -784,7 +781,7 @@ pre.bib .c{color:#7C8DB0}
     <div class="sec-head reveal">
       <div class="sec-eyebrow">10 · BIBTEX · 引用</div>
       <h2>引用本文</h2>
-      <p>论文源稿未提供作者块与正式发表信息，以下字段依据源稿如实填写，依赖发表记录的字段已标注。</p>
+      <p>作者与机构取自 VLA-AN-style.sty（浙江大学、微分智飞，共 9 位作者）；依赖正式发表记录的字段已标注。</p>
     </div>
     <div class="bib-wrap reveal">
       <div class="bib-head">
@@ -793,13 +790,13 @@ pre.bib .c{color:#7C8DB0}
       </div>
       <pre class="bib" id="bibCode">@misc{zhu2026diffwam,
   title        = {DiffWAM: A Fast and Efficient Navigation World Action Model},
-  author       = {Zhu, Mo and others},
+  author       = {Zhu, Mo and Wu, Yuze and Huang, Xijie and Cui, Xiao and Gai, Weiqi and Li, Xingxing and Du, Yuheng and Zhou, Xin and Gao, Fei},
   year         = {2026},
   note         = {Preprint}
 }
 <span class="c">% arXiv ID 与发表 venue 请按正式发表记录补全</span></pre>
     </div>
-    <p class="bib-note">标题、作者（Mo Zhu et al.）与年份取自论文源稿；正式发表后请补充 arXiv ID 与会议 / 期刊信息。</p>
+    <p class="bib-note">标题、完整作者名单与年份取自论文源稿（VLA-AN-style.sty）；正式发表后请补充 arXiv ID 与会议 / 期刊信息。</p>
   </div>
 </section>
 </main>
