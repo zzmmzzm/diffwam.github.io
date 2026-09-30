@@ -232,6 +232,8 @@ footer .refs a{color:#B9C8E2;text-decoration:none}
 footer .refs a:hover{color:#fff}
 footer .f-bottom{font-size:12.5px;color:#7789A5}
 footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
+.f-stat{font-family:var(--font-m);font-size:12.5px;color:var(--on-muted);margin-top:6px}
+.f-stat b{color:var(--amber);font-weight:600}
 
 /* ===== reveal (light) ===== */
 .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
@@ -775,6 +777,7 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
     <div class="f-bottom">
       <p>This page is a paper showcase; all metrics are the paper's self-reported development-set / benchmark results, not independent third-party reproductions.</p>
       <p class="f-note">Generated with Doubao · Data &amp; figures: DiffWAM manuscript (template.tex, Mo Zhu et al.)</p>
+      <p class="f-stat">Site visits: <b id="busuanzi_value_site_pv">0</b> &middot; Unique visitors: <b id="busuanzi_value_site_uv">0</b></p>
     </div>
   </div>
 </footer>
@@ -998,7 +1001,6 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
   }
 })();
 </script>
-</body>
-</html>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 </body>
 </html>

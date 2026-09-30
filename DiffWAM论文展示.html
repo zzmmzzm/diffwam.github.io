@@ -229,6 +229,8 @@ footer .refs a{color:#B9C8E2;text-decoration:none}
 footer .refs a:hover{color:#fff}
 footer .f-bottom{font-size:12.5px;color:#7789A5}
 footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
+.f-stat{font-family:var(--font-m);font-size:12.5px;color:var(--on-muted);margin-top:6px}
+.f-stat b{color:var(--amber);font-weight:600}
 
 /* ===== reveal (light) ===== */
 .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
@@ -784,6 +786,7 @@ pre.bib .c{color:#7C8DB0}
     <div class="f-bottom">
       <p>页面仅为论文内容展示，所有指标均为论文自报的开发集 / 基准结果，不代表独立第三方复现。</p>
       <p class="f-note">Generated with Doubao · 数据与图表来源：DiffWAM 论文源稿（template.tex，Mo Zhu et al.）</p>
+      <p class="f-stat">本站访问量：<b id="busuanzi_value_site_pv">0</b> 次 &middot; 访客数：<b id="busuanzi_value_site_uv">0</b> 人</p>
     </div>
   </div>
 </footer>
@@ -1009,7 +1012,6 @@ pre.bib .c{color:#7C8DB0}
   }
 })();
 </script>
-</body>
-</html>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 </body>
 </html>
