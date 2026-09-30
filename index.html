@@ -183,6 +183,12 @@ table.data .hl-val{color:var(--blue-deep);font-weight:700}
 .case p{font-size:13px;color:var(--muted);line-height:1.65}
 @media (max-width:900px){.case-row{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:560px){.case-row{grid-template-columns:1fr}}
+.video-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:22px}
+.video-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 18px 14px;box-shadow:var(--shadow)}
+.video-card h4{font-family:var(--font-d);font-size:15.5px;font-weight:700;margin-bottom:8px}
+.video-card video{width:100%;border-radius:10px;background:#0E1730;display:block;aspect-ratio:16/9;object-fit:contain}
+.video-card .fig-cap{margin-top:10px}
+@media (max-width:900px){.video-row{grid-template-columns:1fr}}
 
 /* ===== Conclusion / limits ===== */
 .concl{background:linear-gradient(160deg,var(--hero-0),var(--hero-1));color:var(--on-dark);border-radius:var(--radius);padding:44px 40px;position:relative;overflow:hidden}
@@ -273,7 +279,7 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
         <span>Keywords <b>World-action models · Trajectory grounding · Geometric distillation</b></span>
       </div>
       <div class="hero-abstract">
-        <p><span class="lead">Core idea:</span> pretrained video models carry rich priors for embodied prediction, but turning their outputs into UAV motion usually requires expensive future-video synthesis and geometric reconstruction. We ask whether the camera motion implied by a generated future can instead be recovered from the frozen generator's initial predictive representation. DiffWAM introduces <b>Latent2Pose</b>, a geometry-conditioned world-action model whose decoder combines multi-level spatiotemporal features with first-image geometry to predict a five-second camera trajectory directly; complete generated videos serve only as offline supervision. The accompanying <b>FastDreamer</b> execution framework hides inference latency inside the execution time of the committed trajectory via single-forward prediction, parallel geometry processing and timestamp-aware asynchronous handoff.</p>
+        <p><span class="lead">Core idea:</span> pretrained video models carry rich priors for embodied prediction, but turning their outputs into UAV motion usually requires expensive future-video synthesis and geometric reconstruction. We ask whether the camera motion implied by a generated future can instead be recovered from the frozen generator's initial predictive representation. DiffWAM introduces <b>Latent2Pose</b>, a geometry-conditioned world-action model whose decoder combines multi-level spatiotemporal features with first-image geometry to predict a five-second camera trajectory directly; complete generated videos serve only as offline supervision. The accompanying <b>FastDreamer</b> execution framework hides inference latency inside the execution time of the committed trajectory via single-forward prediction, parallel geometry processing and timestamp-aware asynchronous handoff. The reported results characterize development-set reconstruction agreement; independent navigation success and on-device execution remain to be established.</p>
       </div>
       <div class="hero-stats">
         <div class="stat"><b class="num">74.40<span class="u">%</span></b><span>DiffWAM-1000 benchmark success rate (1 m endpoint criterion; 1st among baselines)</span></div>
@@ -589,7 +595,7 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
 
     <div class="figure-card wide reveal">
       <img src="assets/real_world.jpg" alt="Eight representative real-UAV experiments: orbiting, crossing, S-shaped trajectory, landing and multi-stage tasks">
-      <p class="fig-cap"><b>Representative real-UAV experiments.</b> Cases I–IV: orbit the dark blue pillar, pass between the two trees on the left, fly an S-shaped trajectory, pass through the circular frame; Cases V–VI: head toward the wall with the “Differential Robotics” logo, head to the red fire hydrant on the far left; Cases VII–VIII: go around the left side of the tree on the right then land on the yellow mat, pass the left side of the electric fan then reach in front of the rock formation (sequential multi-stage goals).<span class="src"> (Fig. 5 · real_world)</span></p>
+      <p class="fig-cap"><b>Representative real-UAV experiments.</b> Cases I–IV: orbit the dark blue pillar, pass between the two trees on the left, fly an S-shaped trajectory, pass through the circular frame; Cases V–VI: head toward the wall with the “Differential Robotics” logo, head to the red fire hydrant on the far left; Cases VII–VIII: go around the left side of the tree on the right then land on the yellow mat, pass the left side of the electric fan then reach in front of the rock formation (sequential multi-stage goals). These eight illustrated cases are selected qualitative demonstrations rather than a complete record of evaluation trials; they are not used to infer the number of evaluated episodes, aggregate physical-flight success rates or per-task completion times.<span class="src"> (Fig. 5 · real_world)</span></p>
     </div>
 
     <div class="cards3" style="margin-top:22px">
@@ -620,6 +626,19 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
       <div class="case reveal"><div class="c-no">CASE VIII</div><div class="c-name">Around fan left side → reach rock formation</div><p>Switching target reference while preserving unmet task requirements</p></div>
       <div class="case reveal"><div class="c-no">CASE V–VI</div><div class="c-name">Outdoor target-oriented navigation</div><p>Relative-position constraints for the wall logo and the “far-left” hydrant</p></div>
       <div class="case reveal"><div class="c-no">CASE I–IV</div><div class="c-name">Indoor structured motion</div><p>Orbiting, two-tree crossing, S-shaped flight, circular-frame crossing</p></div>
+    </div>
+
+    <div class="video-row">
+      <div class="video-card reveal">
+        <h4>Reach → orbit → land · real flight</h4>
+        <video controls preload="metadata" playsinline src="assets/real_approach_orbit_landing.mp4" aria-label="Real-flight demonstration: reach, orbit and landing"></video>
+        <p class="fig-cap">Newly provided real-flight demonstration: reach, orbit and landing maneuver.</p>
+      </div>
+      <div class="video-card reveal">
+        <h4>Pass-through → reach → land · real flight</h4>
+        <video controls preload="metadata" playsinline src="assets/real_pass_through_landing.mp4" aria-label="Real-flight demonstration: pass-through, reach and landing"></video>
+        <p class="fig-cap">Newly provided real-flight demonstration: pass-through, reach and landing maneuver.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -676,34 +695,34 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
   <div class="container">
     <div class="sec-head reveal">
       <div class="sec-eyebrow">08 · ABLATIONS</div>
-      <h2>Ablations: readout architecture, feature depth, compute budget, data scale and objective</h2>
-      <p>Matched training ablations fix dataset splits, initialization, optimizer, training budget, geometry inputs and the model-selection criterion, changing only the factor under study; the world model and geometry backbone stay frozen.</p>
+      <h2>Ablations: readout architecture, feature depth, compute budget, data scale, objective and geometry</h2>
+      <p>Matched training ablations fix dataset splits, initialization, optimizer, training budget, geometry inputs and the model-selection criterion, changing only the factor under study; the world model and geometry backbone stay frozen. The studies cover the trajectory-readout architecture, world-model feature layers, predictive-computation budget, training-data volume, geometric conditioning and training objectives.</p>
     </div>
 
     <div class="chart-grid three">
       <div class="chart-card reveal">
         <h4>Trajectory-readout architecture (six historical cases)</h4>
-        <p class="csub">RMSE / ADE / FDE (est. m). DiffWAM vs MLP: −74.84% / −83.36%; vs Faster-WAM: −50.19% / −59.63%</p>
+        <p class="csub">RMSE / ADE / FDE (est. m) on six historical cases. DiffWAM vs MLP: −74.84% / −83.36%; vs Faster-WAM: −50.19% / −59.63%. RoE: 2.9179° vs Fast-WAM 6.1389° / Faster-WAM 4.5870° / MLP 98.8160°. Trajectory-head P50/P95: 37.35/38.84 ms vs Fast-WAM 59.20/60.97, Faster-WAM 60.37/61.77, WorldVLN 3.14/3.34, MLP 0.22/0.25</p>
         <div class="chart" id="chartArch"></div>
       </div>
       <div class="chart-card reveal">
         <h4>World-model feature-layer selection</h4>
-        <p class="csub">Same native 15×26 grid, 72M pose-head params. Mixed 15/25/35 lowest positional errors; middle 23/25/27 lowest RoE</p>
+        <p class="csub">Same native 15×26 grid, 72M pose-head params. RMSE: mixed 0.3492 / early 0.7250 / middle 0.5397 / deep 0.3790 m. RoE: mixed 2.9179° / early 9.2979° / middle 2.4314° (lowest) / deep 2.5763°</p>
         <div class="chart" id="chartLayers"></div>
       </div>
       <div class="chart-card reveal">
         <h4>World-model evaluations (1 / 2 / 3 / 4)</h4>
-        <p class="csub">RMSE 0.5012 → 0.3492 (−30.33%), ADE −28.76%, FDE −36.53%; RoE non-monotonic, best 2.9179° at 4</p>
+        <p class="csub">RMSE 0.5012 → 0.3492 (−30.33%), ADE −28.76%, FDE −36.53%. RoE (non-monotonic): 3.7897° / 3.1867° / 3.7730° / 2.9179° at 1 / 2 / 3 / 4 evaluations</p>
         <div class="chart" id="chartCompute"></div>
       </div>
       <div class="chart-card reveal">
         <h4>Generated-supervision scale (DiffWAM-1000)</h4>
-        <p class="csub">1k → 64k pairs: RMSE 0.8203 → 0.4873 (−40.59%), FDE 1.4011 → 0.6884 (−50.87%), RoE 9.94° → 2.79° (−71.94%)</p>
+        <p class="csub">1k → 64k pairs: RMSE 0.8203 → 0.4873 (−40.59%), FDE 1.4011 → 0.6884 (−50.87%), RoE 9.9409° → 2.7894° (−71.94%)</p>
         <div class="chart" id="chartScale"></div>
       </div>
       <div class="chart-card reveal">
         <h4>Compact-loss recipes (1,024 pairs / seed 0 / 600 updates)</h4>
-        <p class="csub">Neither simplification nor depth normalization alone helps; selected depth-normalized recipe RMSE −5.69% / FDE −7.78% vs legacy, RoE 3.8131° vs 3.5997°</p>
+        <p class="csub">Neither simplification nor depth normalization alone helps; selected depth-normalized recipe RMSE −5.69% / FDE −7.78% vs legacy. RoE: legacy 3.5997° / unnorm 4.2803° / depth-norm 3.9662° / selected 3.8131°</p>
         <div class="chart" id="chartLoss"></div>
       </div>
     </div>
@@ -716,8 +735,18 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
       </div>
       <div class="mm-card reveal">
         <h4><span class="chip">S</span>More generated supervision helps, under a fixed update budget</h4>
-        <p>On DiffWAM-1000 (random init, 20,000 updates, batch 32): 1k → 64k pairs reduce RMSE 0.8203 → 0.4873 m (−40.59%), FDE 1.4011 → 0.6884 m (−50.87%) and RoE 9.9409° → 2.7894° (−71.94%), monotonically. On the common 500-request development set (abstract protocol), the same scaling reduces position RMSE from 2.1608 to 1.4620 estimated meters under a fixed update budget.</p>
-        <div class="kv"><em>DiffWAM-1000: 0.8203 → 0.4873 m</em><em>500-request dev set: 2.1608 → 1.4620 m</em></div>
+        <p>On DiffWAM-1000 (random init, 20,000 updates, batch 32): 1k → 64k pairs reduce RMSE 0.8203 → 0.4873 m (−40.59%), FDE 1.4011 → 0.6884 m (−50.87%) and RoE 9.9409° → 2.7894° (−71.94%), monotonically. On the common 500-request development set (abstract protocol), the same scaling reduces trajectory RMSE from 2.1608 to 1.4620 m, endpoint error (FDE) from 3.3032 to 2.0652 m and orientation error (RoE) from 11.8227° to 8.3682° under a fixed update budget.</p>
+        <div class="kv"><em>DiffWAM-1000: 0.8203 → 0.4873 m</em><em>500-request dev set: RMSE 2.1608 → 1.4620 m · FDE 3.3032 → 2.0652 m · RoE 11.82° → 8.37°</em></div>
+      </div>
+      <div class="mm-card reveal">
+        <h4><span class="chip">G</span>Spatial geometry matters; auxiliary teacher constraints do not</h4>
+        <p>Full-parameter DiffWAM-1000 controls (64k training records): removing auxiliary teacher constraints changes RMSE 1.4620 → 1.4405 m and FDE 2.0652 → 2.0480 m — no measurable benefit in this configuration. Replacing full spatial geometry with scale-only conditioning instead increases RMSE to 1.5105 m and FDE to 2.2030 m, supporting the value of spatial geometric information for trajectory localization.</p>
+        <div class="kv"><em>full: 1.4620 / 2.0652</em><em>no-aux: 1.4405 / 2.0480</em><em>scale-only: 1.5105 / 2.2030</em></div>
+      </div>
+      <div class="mm-card reveal">
+        <h4><span class="chip">D</span>Historical DEV1000 controls delimit the supported claims</h4>
+        <p>Seed-0 controls on the historical development set (250 object-navigation, 150 fly-through and 100 orbit cases; Pi3 references in MoGe2-estimated meters) show that removing auxiliary losses improves mean reconstruction error under the historical objective protocol, temporal shuffling has little effect on the archived checkpoint, whereas cross-case replacement substantially increases error.</p>
+        <div class="kv"><em>250 obj-nav · 150 fly-through · 100 orbit</em><em>seed-0 · 64k pairs · 20k updates</em></div>
       </div>
     </div>
   </div>
@@ -733,7 +762,7 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F2A33C" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg>
         <div>
           <b>Stated limitations</b>
-          <p>Current results measure reconstruction agreement on a development set; independent navigation success and on-device execution still need to be established. The one-meter endpoint criterion does not by itself verify traversal direction, orbit coverage or landing completion; per-task closed-loop completion, physical-scale accuracy and complete navigation-update latency remain to be quantified.</p>
+          <p>Current results measure reconstruction agreement on a development set; independent navigation success and on-device execution still need to be established. The one-meter endpoint criterion does not by itself verify traversal direction, orbit coverage or landing completion; reliable full orbits and physical-scale accuracy are not yet established, and per-task closed-loop completion and complete navigation-update latency remain to be quantified.</p>
         </div>
       </div>
     </div>

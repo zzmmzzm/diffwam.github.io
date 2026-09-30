@@ -193,6 +193,12 @@ table.data .hl-val{color:var(--blue-deep);font-weight:700}
 .case p{font-size:13px;color:var(--muted);line-height:1.65}
 @media (max-width:900px){.case-row{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:560px){.case-row{grid-template-columns:1fr}}
+.video-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:22px}
+.video-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 18px 14px;box-shadow:var(--shadow)}
+.video-card h4{font-family:var(--font-d);font-size:15.5px;font-weight:700;margin-bottom:8px}
+.video-card video{width:100%;border-radius:10px;background:#0E1730;display:block;aspect-ratio:16/9;object-fit:contain}
+.video-card .fig-cap{margin-top:10px}
+@media (max-width:900px){.video-row{grid-template-columns:1fr}}
 
 /* ===== Conclusion / limits ===== */
 .concl{background:linear-gradient(160deg,var(--hero-0),var(--hero-1));color:var(--on-dark);border-radius:var(--radius);padding:44px 40px;position:relative;overflow:hidden}
@@ -283,7 +289,7 @@ pre.bib .c{color:#7C8DB0}
         <span>关键词 <b>World-action models · Trajectory grounding · Geometric distillation</b></span>
       </div>
       <div class="hero-abstract">
-        <p><span class="lead">核心思路：</span>预训练视频模型富含具身预测先验，但把输出变成无人机运动通常需要昂贵的未来视频合成与几何重建。我们探究：生成未来所隐含的相机运动，能否直接从冻结生成器的<b>初始预测表征</b>中恢复？DiffWAM 用 <b>Latent2Pose</b> 解码器结合多层时空特征与首帧几何，一次截断前向直接输出五秒相机轨迹；完整生成的视频只作为<b>离线教师</b>提供重建监督。配套的 <b>FastDreamer</b> 执行框架用单次前向预测、并行几何处理与带时间戳的异步交接，把推理延迟藏进已提交轨迹的执行时间里。</p>
+        <p><span class="lead">核心思路：</span>预训练视频模型富含具身预测先验，但把输出变成无人机运动通常需要昂贵的未来视频合成与几何重建。我们探究：生成未来所隐含的相机运动，能否直接从冻结生成器的<b>初始预测表征</b>中恢复？DiffWAM 用 <b>Latent2Pose</b> 解码器结合多层时空特征与首帧几何，一次截断前向直接输出五秒相机轨迹；完整生成的视频只作为<b>离线教师</b>提供重建监督。配套的 <b>FastDreamer</b> 执行框架用单次前向预测、并行几何处理与带时间戳的异步交接，把推理延迟藏进已提交轨迹的执行时间里。报告结果表征开发集重建一致性；独立导航成功率与端侧执行仍有待验证。</p>
       </div>
       <div class="hero-stats">
         <div class="stat"><b class="num">74.40<span class="u">%</span></b><span>DiffWAM-1000 基准成功率（1 米终点判据，对比方法中第一）</span></div>
@@ -600,7 +606,7 @@ pre.bib .c{color:#7C8DB0}
 
     <div class="figure-card wide reveal">
       <img src="assets/real_world.jpg" alt="八项代表性真实无人机实验：环绕、穿越、S形轨迹、降落与多阶段任务">
-      <p class="fig-cap"><b>代表性真实无人机实验。</b> 案例 I–IV：环绕深蓝色立柱、穿过左侧两棵树之间、沿 S 形轨迹飞行、穿过圆形框架；案例 V–VI：接近带“微分智飞”标志的墙面、接近最左侧的红色消防栓；案例 VII–VIII：从右侧树木左边绕过再降落黄色垫子、从电风扇左侧绕过再抵达假山前方（依次执行的多阶段目标）。<span class="src">（图 5 · real_world）</span></p>
+      <p class="fig-cap"><b>代表性真实无人机实验。</b> 案例 I–IV：环绕深蓝色立柱、穿过左侧两棵树之间、沿 S 形轨迹飞行、穿过圆形框架；案例 V–VI：接近带“微分智飞”标志的墙面、接近最左侧的红色消防栓；案例 VII–VIII：从右侧树木左边绕过再降落黄色垫子、从电风扇左侧绕过再抵达假山前方（依次执行的多阶段目标）。这八项展示案例为精选定性演示，而非全部评估试次的完整记录；不据此推断评估回合数、聚合物理飞行成功率或分任务完成时间。<span class="src">（图 5 · real_world）</span></p>
     </div>
 
     <div class="cards3" style="margin-top:22px">
@@ -631,6 +637,19 @@ pre.bib .c{color:#7C8DB0}
       <div class="case reveal"><div class="c-no">CASE VIII</div><div class="c-name">绕风扇左侧 → 抵达假山前方</div><p>切换目标参照物，保留未完成的任务要求</p></div>
       <div class="case reveal"><div class="c-no">CASE V–VI</div><div class="c-name">户外目标导向导航</div><p>墙面标志与“最左侧”消防栓的相对位置限定</p></div>
       <div class="case reveal"><div class="c-no">CASE I–IV</div><div class="c-name">室内结构化运动</div><p>环绕、双树穿越、S 形飞行、圆形框架穿越</p></div>
+    </div>
+
+    <div class="video-row">
+      <div class="video-card reveal">
+        <h4>到达 → 环绕 → 降落 · 真实飞行</h4>
+        <video controls preload="metadata" playsinline src="assets/real_approach_orbit_landing.mp4" aria-label="真实飞行演示：到达、环绕与降落"></video>
+        <p class="fig-cap">新增真实飞行演示：到达、环绕与降落动作。</p>
+      </div>
+      <div class="video-card reveal">
+        <h4>穿越 → 到达 → 降落 · 真实飞行</h4>
+        <video controls preload="metadata" playsinline src="assets/real_pass_through_landing.mp4" aria-label="真实飞行演示：穿越、到达与降落"></video>
+        <p class="fig-cap">新增真实飞行演示：穿越、到达与降落动作。</p>
+      </div>
     </div>
   </div>
 </section>
@@ -687,34 +706,34 @@ pre.bib .c{color:#7C8DB0}
   <div class="container">
     <div class="sec-head reveal">
       <div class="sec-eyebrow">08 · ABLATIONS</div>
-      <h2>消融：读出架构、特征层、计算预算、数据规模与目标函数</h2>
-      <p>配对训练消融固定数据划分、初始化、优化器、训练预算、几何输入与模型选择标准，仅改变被研究的因素；世界模型与几何骨干保持冻结。</p>
+      <h2>消融：读出架构、特征层、计算预算、数据规模、目标函数与几何条件</h2>
+      <p>配对训练消融固定数据划分、初始化、优化器、训练预算、几何输入与模型选择标准，仅改变被研究的因素；世界模型与几何骨干保持冻结。研究覆盖轨迹读出架构、世界模型特征层、预测计算预算、训练数据规模、几何条件与训练目标。</p>
     </div>
 
     <div class="chart-grid three">
       <div class="chart-card reveal">
         <h4>轨迹读出架构对比（六历史案例）</h4>
-        <p class="csub">RMSE / ADE / FDE（估计米）。DiffWAM 相对 MLP：RMSE −74.84%、FDE −83.36%；相对 Faster-WAM：−50.19% / −59.63%</p>
+        <p class="csub">RMSE / ADE / FDE（估计米，六历史案例）。DiffWAM 相对 MLP：RMSE −74.84%、FDE −83.36%；相对 Faster-WAM：−50.19% / −59.63%。RoE：2.9179°，Fast-WAM 6.1389° / Faster-WAM 4.5870° / MLP 98.8160°。位姿头 P50/P95：37.35/38.84 ms，Fast-WAM 59.20/60.97、Faster-WAM 60.37/61.77、WorldVLN 3.14/3.34、MLP 0.22/0.25</p>
         <div class="chart" id="chartArch"></div>
       </div>
       <div class="chart-card reveal">
         <h4>世界模型特征层选择</h4>
-        <p class="csub">相同原生 15×26 网格、72M 位姿头参数。混合 15/25/35 位置误差最低；中间层 23/25/27 RoE 最低</p>
+        <p class="csub">相同原生 15×26 网格、72M 位姿头参数。RMSE：混合 0.3492 / 早期 0.7250 / 中间 0.5397 / 深层 0.3790 m。RoE：混合 2.9179° / 早期 9.2979° / 中间 2.4314°（最低）/ 深层 2.5763°</p>
         <div class="chart" id="chartLayers"></div>
       </div>
       <div class="chart-card reveal">
         <h4>世界模型计算次数（1 / 2 / 3 / 4 次）</h4>
-        <p class="csub">RMSE 0.5012 → 0.3492（−30.33%）、ADE −28.76%、FDE −36.53%；RoE 非单调，4 次时最佳 2.9179°</p>
+        <p class="csub">RMSE 0.5012 → 0.3492（−30.33%）、ADE −28.76%、FDE −36.53%。RoE（非单调）：1 / 2 / 3 / 4 次分别为 3.7897° / 3.1867° / 3.7730° / 2.9179°</p>
         <div class="chart" id="chartCompute"></div>
       </div>
       <div class="chart-card reveal">
         <h4>生成监督数据规模（DiffWAM-1000）</h4>
-        <p class="csub">1k → 64k 配对：RMSE 0.8203 → 0.4873（−40.59%）、FDE 1.4011 → 0.6884（−50.87%）、RoE 9.94° → 2.79°（−71.94%）</p>
+        <p class="csub">1k → 64k 配对：RMSE 0.8203 → 0.4873（−40.59%）、FDE 1.4011 → 0.6884（−50.87%）、RoE 9.9409° → 2.7894°（−71.94%）</p>
         <div class="chart" id="chartScale"></div>
       </div>
       <div class="chart-card reveal">
         <h4>简洁损失配方对比（1,024 对 / seed 0 / 600 更新）</h4>
-        <p class="csub">仅简化或仅深度归一化都不保证改善；选定配方 RMSE −5.69% / FDE −7.78% vs 历史复合损失，RoE 3.8131° vs 3.5997°</p>
+        <p class="csub">仅简化或仅深度归一化都不保证改善；选定配方 RMSE −5.69% / FDE −7.78% vs 历史复合损失。RoE：历史复合 3.5997° / 未归一化 4.2803° / 深度归一化 3.9662° / 选定配方 3.8131°</p>
         <div class="chart" id="chartLoss"></div>
       </div>
     </div>
@@ -727,8 +746,18 @@ pre.bib .c{color:#7C8DB0}
       </div>
       <div class="mm-card reveal">
         <h4><span class="chip">S</span>更多生成监督有效，且不增加更新预算</h4>
-        <p>DiffWAM-1000 口径（随机初始化、20,000 更新、batch 32）：1k → 64k 配对使 RMSE 由 0.8203 降至 0.4873 m（−40.59%）、FDE 由 1.4011 降至 0.6884 m（−50.87%）、RoE 由 9.9409° 降至 2.7894°（−71.94%），单调改善。论文摘要口径：共同 500-request 开发集、固定更新预算下，1,000 → 64,000 对使位置 RMSE 由 2.1608 降至 1.4620 估计米。</p>
-        <div class="kv"><em>DiffWAM-1000: 0.8203 → 0.4873 m</em><em>500-request 开发集: 2.1608 → 1.4620 m</em></div>
+        <p>DiffWAM-1000 口径（随机初始化、20,000 更新、batch 32）：1k → 64k 配对使 RMSE 由 0.8203 降至 0.4873 m（−40.59%）、FDE 由 1.4011 降至 0.6884 m（−50.87%）、RoE 由 9.9409° 降至 2.7894°（−71.94%），单调改善。论文摘要口径：共同 500-request 开发集、固定更新预算下，1,000 → 64,000 对使轨迹 RMSE 由 2.1608 降至 1.4620 m、终点误差（FDE）由 3.3032 降至 2.0652 m、朝向误差（RoE）由 11.8227° 降至 8.3682°。</p>
+        <div class="kv"><em>DiffWAM-1000: 0.8203 → 0.4873 m</em><em>500-request 开发集: RMSE 2.1608 → 1.4620 m · FDE 3.3032 → 2.0652 m · RoE 11.82° → 8.37°</em></div>
+      </div>
+      <div class="mm-card reveal">
+        <h4><span class="chip">G</span>空间几何有用；额外教师约束无明显收益</h4>
+        <p>全参数 DiffWAM-1000 对照（64k 训练记录）：移除额外教师约束使 RMSE 由 1.4620 变为 1.4405 m、FDE 由 2.0652 变为 2.0480 m——该配置下无可测量收益。把完整空间几何换成仅尺度条件则使 RMSE 升至 1.5105 m、FDE 升至 2.2030 m，支持空间几何信息对轨迹定位的价值。</p>
+        <div class="kv"><em>full: 1.4620 / 2.0652</em><em>no-aux: 1.4405 / 2.0480</em><em>scale-only: 1.5105 / 2.2030</em></div>
+      </div>
+      <div class="mm-card reveal">
+        <h4><span class="chip">D</span>历史 DEV1000 对照界定支持的主张范围</h4>
+        <p>历史开发集上的 seed-0 对照（250 个目标导航、150 个穿行、100 个环绕案例；Pi3 参考处于 MoGe2 估计米制下）显示：移除辅助损失在历史目标协议下改善平均重建误差；时序打乱对归档检查点影响很小，而跨案例替换显著增加误差。</p>
+        <div class="kv"><em>250 目标导航 · 150 穿行 · 100 环绕</em><em>seed-0 · 64k 配对 · 20k 更新</em></div>
       </div>
     </div>
   </div>
@@ -744,7 +773,7 @@ pre.bib .c{color:#7C8DB0}
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F2A33C" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg>
         <div>
           <b>如实说明的局限</b>
-          <p>现有结果衡量开发集上的重建一致性；独立导航成功率与端侧执行仍需建立。一米终点判据本身不能验证穿越方向、环绕覆盖或降落完成情况；按任务的闭环完成率、物理尺度精度与完整导航更新时延仍需量化。</p>
+          <p>现有结果衡量开发集上的重建一致性；独立导航成功率与端侧执行仍需建立。一米终点判据本身不能验证穿越方向、环绕覆盖或降落完成情况；可靠的完整环绕与物理尺度精度尚未确立，按任务的闭环完成率与完整导航更新时延仍需量化。</p>
         </div>
       </div>
     </div>
