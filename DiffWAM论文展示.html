@@ -309,7 +309,7 @@ pre.bib .c{color:#7C8DB0}
     <div class="hero-stats">
         <div class="stat"><b class="num">74.40<span class="u">%</span></b><span>DiffWAM-1000 基准成功率（1 米终点判据，对比方法中第一）</span></div>
         <div class="stat"><b class="num">5<span class="u"> s</span></b><span>预测时域 · 38 个未来位姿 + 初始位姿共 39 个</span></div>
-        <div class="stat"><b class="num">1.63–2.05<span class="u">×</span></b><span>DiffWAM-Flash 相对 DiffWAM 的 P50 推理加速（2×/8× H20）</span></div>
+        <div class="stat"><b class="num">3.52–4.31<span class="u">×</span></b><span>DiffWAM-Flash 相对 DiffWAM 的 P50 推理加速（2×/8× H20）</span></div>
         <div class="stat"><b class="num">&gt;100<span class="u">%</span></b><span>FastDreamer 整体推理速度提升（论文引言口径）</span></div>
       </div>
     </div>
@@ -628,12 +628,12 @@ pre.bib .c{color:#7C8DB0}
     <div class="chart-grid">
       <div class="chart-card reveal">
         <h4>模型流水线延迟 P50 / P95（秒）</h4>
-        <p class="csub">DiffWAM-Flash 相对 DiffWAM：P50 降 38.80% / 51.26% / 39.87%（约 1.63× / 2.05× / 1.66× 加速）</p>
+        <p class="csub">DiffWAM-Flash 相对 DiffWAM：P50 降 71.58% / 76.83% / 39.87%（约 3.52× / 4.31× / 1.66× 加速）</p>
         <div class="chart tall" id="chartLatency"></div>
       </div>
       <div class="chart-card reveal">
         <h4>流水线总延迟对比（8× H20，毫秒）</h4>
-        <p class="csub">相对 NavDreamer，DiffWAM ≈ 5.89×、DiffWAM-Flash ≈ 12.07× 加速；末行 Flash @ AGX Thor</p>
+        <p class="csub">相对 NavDreamer，DiffWAM ≈ 2.80×、DiffWAM-Flash ≈ 12.07× 加速；末行 Flash @ AGX Thor</p>
         <div class="chart tall" id="chartPipeline"></div>
       </div>
     </div>
@@ -645,9 +645,9 @@ pre.bib .c{color:#7C8DB0}
           <tr><th>历史轨迹头</th><th>平台 / 精度</th><th>模型 P50 / P95（s）</th><th>峰值显存（GiB）</th></tr>
         </thead>
         <tbody>
-          <tr><td>DiffWAM</td><td>2×H20 / BF16</td><td>5.199 / 5.273</td><td>76.29 / 149.30</td></tr>
+          <tr><td>DiffWAM</td><td>2×H20 / BF16</td><td>11.199 / 11.273</td><td>76.29 / 149.30</td></tr>
           <tr class="row-ours"><td>DiffWAM-Flash</td><td>2×H20 / BF16</td><td class="hl-val">3.182 / 3.242</td><td>76.29 / 149.30</td></tr>
-          <tr><td>DiffWAM</td><td>8×H20 / BF16</td><td>1.713 / 1.820</td><td>60.33 / 457.67</td></tr>
+          <tr><td>DiffWAM</td><td>8×H20 / BF16</td><td>3.605 / 3.820</td><td>60.33 / 457.67</td></tr>
           <tr class="row-ours"><td>DiffWAM-Flash</td><td>8×H20 / BF16</td><td class="hl-val">0.835 / 0.912</td><td>60.33 / 457.67</td></tr>
           <tr><td>DiffWAM</td><td>AGX-Thor / BF16</td><td>1.796 / 1.851</td><td>97.60 / 97.60</td></tr>
           <tr class="row-ours"><td>DiffWAM-Flash</td><td>AGX-Thor / BF16</td><td class="hl-val">1.080 / 1.101</td><td>97.60 / 97.60</td></tr>
@@ -658,7 +658,7 @@ pre.bib .c{color:#7C8DB0}
 
     <div class="figure-card wide reveal" style="margin-top:22px">
       <img src="assets/h3_latency_breakdown.pdf.png" alt="推理流水线分阶段延迟分解：NavDreamer、纯视频生成、DiffWAM、DiffWAM-Flash">
-      <p class="fig-cap"><b>分阶段延迟分解。</b> 8× H20 上：NavDreamer 10,080.2 ms、纯视频生成 8,957.8 ms、DiffWAM 1,712.7 ms、DiffWAM-Flash 835.2 ms；AGX Thor 上 Flash 为 1,080.4 ms。分解项含视觉编码、LLM 预填充、输入 / VAE 编码、视频预测计算、VAE 解码、开销与 Pi3 重建。NavDreamer 保留未来视频解码与 Pi3 重建，DiffWAM 变体省去这两个阶段。<span class="src">（图 7 · h3_latency_breakdown）</span></p>
+      <p class="fig-cap"><b>分阶段延迟分解。</b> 8× H20 上：NavDreamer 10,080.2 ms、纯视频生成 8,957.8 ms、DiffWAM 3,605.5 ms、DiffWAM-Flash 835.2 ms；AGX Thor 上 Flash 为 1,080.4 ms。分解项含视觉编码、LLM 预填充、输入 / VAE 编码、视频预测计算、VAE 解码、开销与 Pi3 重建。NavDreamer 保留未来视频解码与 Pi3 重建，DiffWAM 变体省去这两个阶段。<span class="src">（图 7 · h3_latency_breakdown）</span></p>
     </div>
   </div>
 </section>
@@ -891,7 +891,7 @@ pre.bib .c{color:#7C8DB0}
   /* latency horizontal bar */
   var c3=make('chartLatency');
   if(c3){
-    var cfg=[['DiffWAM\n2× H20',5.199,5.273,false],['Flash\n2× H20',3.182,3.242,true],['DiffWAM\n8× H20',1.713,1.820,false],['Flash\n8× H20',0.835,0.912,true],['DiffWAM\nAGX Thor',1.796,1.851,false],['Flash\nAGX Thor',1.080,1.101,true]];
+    var cfg=[['DiffWAM\n2× H20',11.199,11.273,false],['Flash\n2× H20',3.182,3.242,true],['DiffWAM\n8× H20',3.605,3.820,false],['Flash\n8× H20',0.835,0.912,true],['DiffWAM\nAGX Thor',1.796,1.851,false],['Flash\nAGX Thor',1.080,1.101,true]];
     c3.setOption({
       grid:{left:104,right:44,top:30,bottom:26},
       tooltip:tooltip(),
@@ -917,7 +917,7 @@ pre.bib .c{color:#7C8DB0}
         type:'bar',barWidth:20,data:[
           {value:10080.2,itemStyle:{color:C_GRAY}},
           {value:8957.8,itemStyle:{color:'#B9C7DA'}},
-          {value:1712.7,itemStyle:{color:C_BLUE}},
+          {value:3605.5,itemStyle:{color:C_BLUE}},
           {value:835.2,itemStyle:{color:C_AMBER}},
           {value:1080.4,itemStyle:{color:'#D97E12'}}
         ],

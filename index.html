@@ -299,7 +299,7 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
     <div class="hero-stats">
         <div class="stat"><b class="num">74.40<span class="u">%</span></b><span>DiffWAM-1000 benchmark success rate (1 m endpoint criterion; 1st among baselines)</span></div>
         <div class="stat"><b class="num">5<span class="u"> s</span></b><span>Prediction horizon · 38 future poses + initial pose = 39</span></div>
-        <div class="stat"><b class="num">1.63–2.05<span class="u">×</span></b><span>DiffWAM-Flash vs DiffWAM P50 inference speed-up (2× / 8× H20)</span></div>
+        <div class="stat"><b class="num">3.52–4.31<span class="u">×</span></b><span>DiffWAM-Flash vs DiffWAM P50 inference speed-up (2× / 8× H20)</span></div>
         <div class="stat"><b class="num">&gt;100<span class="u">%</span></b><span>Overall inference speed-up of FastDreamer (per the paper's introduction)</span></div>
       </div>
     </div>
@@ -617,12 +617,12 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
     <div class="chart-grid">
       <div class="chart-card reveal">
         <h4>Pipeline latency P50 / P95 (s)</h4>
-        <p class="csub">DiffWAM-Flash vs DiffWAM: P50 −38.80% / −51.26% / −39.87% (≈1.63× / 2.05× / 1.66× speed-up)</p>
+        <p class="csub">DiffWAM-Flash vs DiffWAM: P50 −71.58% / −76.83% / −39.87% (≈3.52× / 4.31× / 1.66× speed-up)</p>
         <div class="chart tall" id="chartLatency"></div>
       </div>
       <div class="chart-card reveal">
         <h4>End-to-end pipeline totals (8× H20, ms)</h4>
-        <p class="csub">vs NavDreamer: DiffWAM ≈5.89×, DiffWAM-Flash ≈12.07×; last row Flash @ AGX Thor</p>
+        <p class="csub">vs NavDreamer: DiffWAM ≈2.80×, DiffWAM-Flash ≈12.07×; last row Flash @ AGX Thor</p>
         <div class="chart tall" id="chartPipeline"></div>
       </div>
     </div>
@@ -634,9 +634,9 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
           <tr><th>Trajectory head</th><th>Platform / Precision</th><th>Model P50 / P95 (s)</th><th>Peak memory (GiB)</th></tr>
         </thead>
         <tbody>
-          <tr><td>DiffWAM</td><td>2×H20 / BF16</td><td>5.199 / 5.273</td><td>76.29 / 149.30</td></tr>
+          <tr><td>DiffWAM</td><td>2×H20 / BF16</td><td>11.199 / 11.273</td><td>76.29 / 149.30</td></tr>
           <tr class="row-ours"><td>DiffWAM-Flash</td><td>2×H20 / BF16</td><td class="hl-val">3.182 / 3.242</td><td>76.29 / 149.30</td></tr>
-          <tr><td>DiffWAM</td><td>8×H20 / BF16</td><td>1.713 / 1.820</td><td>60.33 / 457.67</td></tr>
+          <tr><td>DiffWAM</td><td>8×H20 / BF16</td><td>3.605 / 3.820</td><td>60.33 / 457.67</td></tr>
           <tr class="row-ours"><td>DiffWAM-Flash</td><td>8×H20 / BF16</td><td class="hl-val">0.835 / 0.912</td><td>60.33 / 457.67</td></tr>
           <tr><td>DiffWAM</td><td>AGX-Thor / BF16</td><td>1.796 / 1.851</td><td>97.60 / 97.60</td></tr>
           <tr class="row-ours"><td>DiffWAM-Flash</td><td>AGX-Thor / BF16</td><td class="hl-val">1.080 / 1.101</td><td>97.60 / 97.60</td></tr>
@@ -647,7 +647,7 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
 
     <div class="figure-card wide reveal" style="margin-top:22px">
       <img src="assets/h3_latency_breakdown.pdf.png" alt="Inference pipeline stage-wise latency breakdown: NavDreamer, pure video generation, DiffWAM, DiffWAM-Flash">
-      <p class="fig-cap"><b>Stage-wise latency breakdown.</b> On 8× H20: NavDreamer 10,080.2 ms, pure video generation 8,957.8 ms, DiffWAM 1,712.7 ms, DiffWAM-Flash 835.2 ms; Flash on AGX Thor 1,080.4 ms. Components include vision encoding, LLM prefill, input / VAE encode, video predictive compute, VAE decode, overhead and Pi3 reconstruction. NavDreamer keeps future-video decoding and Pi3 reconstruction; DiffWAM variants drop both.<span class="src"> (Fig. 7 · h3_latency_breakdown)</span></p>
+      <p class="fig-cap"><b>Stage-wise latency breakdown.</b> On 8× H20: NavDreamer 10,080.2 ms, pure video generation 8,957.8 ms, DiffWAM 3,605.5 ms, DiffWAM-Flash 835.2 ms; Flash on AGX Thor 1,080.4 ms. Components include vision encoding, LLM prefill, input / VAE encode, video predictive compute, VAE decode, overhead and Pi3 reconstruction. NavDreamer keeps future-video decoding and Pi3 reconstruction; DiffWAM variants drop both.<span class="src"> (Fig. 7 · h3_latency_breakdown)</span></p>
     </div>
   </div>
 </section>
@@ -880,7 +880,7 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
   /* latency horizontal bar */
   var c3=make('chartLatency');
   if(c3){
-    var cfg=[['DiffWAM\n2× H20',5.199,5.273,false],['Flash\n2× H20',3.182,3.242,true],['DiffWAM\n8× H20',1.713,1.820,false],['Flash\n8× H20',0.835,0.912,true],['DiffWAM\nAGX Thor',1.796,1.851,false],['Flash\nAGX Thor',1.080,1.101,true]];
+    var cfg=[['DiffWAM\n2× H20',11.199,11.273,false],['Flash\n2× H20',3.182,3.242,true],['DiffWAM\n8× H20',3.605,3.820,false],['Flash\n8× H20',0.835,0.912,true],['DiffWAM\nAGX Thor',1.796,1.851,false],['Flash\nAGX Thor',1.080,1.101,true]];
     c3.setOption({
       grid:{left:104,right:44,top:30,bottom:26},
       tooltip:tooltip(),
@@ -906,7 +906,7 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
         type:'bar',barWidth:20,data:[
           {value:10080.2,itemStyle:{color:C_GRAY}},
           {value:8957.8,itemStyle:{color:'#B9C7DA'}},
-          {value:1712.7,itemStyle:{color:C_BLUE}},
+          {value:3605.5,itemStyle:{color:C_BLUE}},
           {value:835.2,itemStyle:{color:C_AMBER}},
           {value:1080.4,itemStyle:{color:'#D97E12'}}
         ],
