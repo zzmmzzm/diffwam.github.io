@@ -86,8 +86,12 @@ section{scroll-margin-top:76px}
 .hero-keywords{text-align:center;font-size:14px;color:var(--on-muted);margin-top:28px}
 .hero-keywords b{color:var(--on-dark);font-weight:600}
 .hero-abstract .lead{color:var(--on-dark);font-weight:500}
-.hero-links{margin-top:26px;display:flex;justify-content:center}
-.btn-paper{display:inline-flex;align-items:center;gap:10px;padding:11px 22px;border:1px solid rgba(242,163,60,.55);border-radius:999px;background:rgba(242,163,60,.08);color:var(--amber);font-family:var(--font-d);font-size:14.5px;font-weight:600;text-decoration:none;transition:background .2s,transform .2s}
+.hero-links{margin-top:26px;display:flex;flex-direction:column;align-items:center;gap:13px}
+.hero-link-group{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px}
+.hl-label{font-family:var(--font-m);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--on-muted);margin-right:2px}
+.btn-ds{display:inline-flex;align-items:center;padding:10px 20px;border:1px solid rgba(125,180,255,.45);border-radius:999px;background:rgba(125,180,255,.08);color:#BFD9FF;font-family:var(--font-d);font-size:15px;font-weight:600;text-decoration:none;transition:background .2s,transform .2s}
+.btn-ds:hover{background:rgba(125,180,255,.16);transform:translateY(-1px)}
+.btn-paper{display:inline-flex;align-items:center;gap:10px;padding:11px 20px;border:1px solid rgba(242,163,60,.55);border-radius:999px;background:rgba(242,163,60,.08);color:var(--amber);font-family:var(--font-d);font-size:16px;font-weight:700;text-decoration:none;transition:background .2s,transform .2s}
 .btn-paper:hover{background:rgba(242,163,60,.16);transform:translateY(-1px)}
 .btn-paper .bp-id{font-family:var(--font-m);font-size:12px;color:var(--on-muted);border:1px solid rgba(234,242,253,.25);border-radius:999px;padding:2px 9px}
 .mm-results{display:flex;flex-wrap:wrap;gap:14px;margin-top:22px}
@@ -322,8 +326,19 @@ pre.bib .c{color:#7C8DB0}
         <div class="stat"><b class="num">3.52–4.31<span class="u">×</span></b><span>DiffWAM-Flash 相对 DiffWAM 的 P50 推理加速（2×/8× H20）</span></div>
         <div class="stat"><b class="num">&gt;100<span class="u">%</span></b><span>FastDreamer 整体推理速度提升（论文引言口径）</span></div>
       <div class="hero-links">
-        <a class="btn-paper" href="https://arxiv.org/abs/2609.39763" target="_blank" rel="noopener">论文 &middot; arXiv<span class="bp-id">2609.39763</span></a>
-      </div>
+        <div class="hero-link-group">
+          <span class="hl-label">数据集</span>
+          <a class="btn-ds" href="https://xinjiu612.github.io/NavGen/" target="_blank" rel="noopener">NavGen</a>
+          <a class="btn-ds" href="https://lij1500.github.io/flymirage_website/" target="_blank" rel="noopener">FlyMirage</a>
+        </div>
+        <div class="hero-link-group">
+          <span class="hl-label">论文</span>
+          <a class="btn-paper" href="https://arxiv.org/abs/2609.39763" target="_blank" rel="noopener">DiffWAM<span class="bp-id">2609.39763</span></a>
+          <a class="btn-paper" href="https://arxiv.org/abs/2609.30770" target="_blank" rel="noopener">NavGen<span class="bp-id">2609.30770</span></a>
+          <a class="btn-paper" href="https://arxiv.org/abs/2605.19600" target="_blank" rel="noopener">FlyMirage<span class="bp-id">2605.19600</span></a>
+          <a class="btn-paper" href="https://arxiv.org/abs/2602.09765" target="_blank" rel="noopener">NavDreamer<span class="bp-id">2602.09765</span></a>
+        </div>
+      </div>      </div>
     </div>
   </div>
 </header>
@@ -826,7 +841,7 @@ pre.bib .c{color:#7C8DB0}
       <div class="refs">
                 <h5>相关方法</h5>
         <div>
-          <a href="https://arxiv.org/abs/2602.09765">NavDreamer · 2602.09765</a> · <a href="https://arxiv.org/abs/2008.08835">EGO-Planner · 2008.08835</a>
+          <a href="https://arxiv.org/abs/2602.09765">NavDreamer · 2602.09765</a> · <a href="https://arxiv.org/abs/2609.30770">NavGen · 2609.30770</a> · <a href="https://arxiv.org/abs/2605.19600">FlyMirage · 2605.19600</a> · <a href="https://arxiv.org/abs/2008.08835">EGO-Planner · 2008.08835</a>
         </div>
       </div>
     </div>
