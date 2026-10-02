@@ -86,8 +86,8 @@ section{scroll-margin-top:76px}
 .hero-keywords{text-align:center;font-size:14px;color:var(--on-muted);margin-top:28px}
 .hero-keywords b{color:var(--on-dark);font-weight:600}
 .hero-abstract .lead{color:var(--on-dark);font-weight:500}
-.hero-links{margin-top:26px;display:flex;flex-direction:column;align-items:center;gap:13px}
-.hero-link-group{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px}
+.hero-links{margin-top:26px;display:flex;flex-direction:column;align-items:center;gap:13px;width:100%}
+.hero-link-group{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px;width:100%}
 .hl-label{font-family:var(--font-m);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--on-muted);margin-right:2px}
 .btn-ds{display:inline-flex;align-items:center;padding:10px 20px;border:1px solid rgba(125,180,255,.45);border-radius:999px;background:rgba(125,180,255,.08);color:#BFD9FF;font-family:var(--font-d);font-size:15px;font-weight:600;text-decoration:none;transition:background .2s,transform .2s}
 .btn-ds:hover{background:rgba(125,180,255,.16);transform:translateY(-1px)}
@@ -325,6 +325,7 @@ pre.bib .c{color:#7C8DB0}
         <div class="stat"><b class="num">5<span class="u"> s</span></b><span>预测时域 · 38 个未来位姿 + 初始位姿共 39 个</span></div>
         <div class="stat"><b class="num">3.52–4.31<span class="u">×</span></b><span>DiffWAM-Flash 相对 DiffWAM 的 P50 推理加速（2×/8× H20）</span></div>
         <div class="stat"><b class="num">&gt;100<span class="u">%</span></b><span>FastDreamer 整体推理速度提升（论文引言口径）</span></div>
+    </div>
       <div class="hero-links">
         <div class="hero-link-group">
           <span class="hl-label">数据集</span>
@@ -459,86 +460,107 @@ pre.bib .c{color:#7C8DB0}
 <section class="sec alt" id="fastdreamer">
   <div class="container">
     <div class="sec-head reveal">
-      <div class="sec-eyebrow">04 · FASTDREAMER</div>
-      <h2>把推理延迟“藏”进已提交轨迹的执行时间里</h2>
-      <p>闭环执行的两个关键问题：额外常驻一个大型改写模型会挤占端侧显存；而无人机在轨迹准备期间仍在持续运动。FastDreamer 用共享权重改写、并行提议推理、飞行时间预算与前瞻式交接分别应对。</p>
+      <div class="sec-eyebrow">04 &middot; FASTDREAMER</div>
+      <h2>把推理延迟&ldquo;藏&rdquo;进已提交轨迹的执行时间里</h2>
+      <p>并行提议准备、前瞻对齐与安全门控交接，把推理与飞行过程重叠起来。</p>
     </div>
-    <div class="mm-grid">
-      <div class="mm-card reveal">
-        <h4><span class="chip">Q</span>共享权重提示词改写</h4>
-        <p>复用世界模型条件分支中已常驻的视觉语言参数 Q<sub>ω</sub>，把任务级指令 + 当前观测 + 任务上下文 h<sub>n</sub> 改写为局部运动条件 c<sub>n</sub>，避免为改写单独常驻第二个大模型。改写不保证语义完全正确，进度维护由任务管理器负责。</p>
-        <div class="formula-box"><div class="fl">REWRITING</div><div class="eq-scroll">$$c_n=\mathcal{Q}_{\omega}(I_n,\mathcal{I},h_n)$$</div></div>
-      </div>
-      <div class="mm-card reveal">
-        <h4><span class="chip">∥</span>并行提议推理</h4>
-        <p>MoGe2 不依赖改写条件，可与提示词改写同时启动。理想关键路径为输入处理 + 两条分支中较慢的一条 + 轨迹头 + 输出交付。并发分支可能竞争 GPU 算力与带宽，实际延迟必须在联合运行配置下实测。</p>
-        <div class="formula-box"><div class="fl">CRITICAL PATH</div><div class="eq-scroll">$$L_{\mathrm{proposal}}^{\mathrm{ideal}}=L_{\mathrm{input}}+\max(L_{\mathrm{pred}},L_{\mathrm{geo}})+L_{\mathrm{head}}+L_{\mathrm{output}}$$</div></div>
-      </div>
-      <div class="mm-card reveal">
-        <h4><span class="chip">B</span>飞行时间预算</h4>
-        <p>把当前已提交轨迹的剩余执行时域当作准备预算：估计准备时延 L̂<sub>n</sub>、不确定性余量 M<sub>n</sub> 与回退余量 R<sub>n</sub> 之和须不超过 B<sub>n</sub> = e<sub>n</sub> − u<sub>n</sub>；早到等待预定激活，迟到必须重新调度校验或拒绝。g<sub>n</sub> = 0 只说明未超出原始时域，不等于零等待成功。</p>
-        <div class="formula-box"><div class="fl">ADMISSION</div><div class="eq-scroll">$$\widehat{L}_n+M_n+R_n\le B_n,\qquad g_n=\max(0,\,d_n-B_n)$$</div></div>
-      </div>
-      <div class="mm-card reveal">
-        <h4><span class="chip">H</span>前瞻式轨迹交接</h4>
-        <p>提议锚定拍摄时刻 t<sub>n</sub> 的相机系，再经世界系提升与机体外参变换；用已提交运动把状态传播到预定交接时刻，满足位置、速度连续的最低条件。仅改时间戳不足以补救失配；无效 / 过期 / 被取代的提议不得覆盖当前有效计划。</p>
-        <div class="formula-box"><div class="fl">CONTINUITY</div><div class="eq-scroll">$$p_n^{+}(0)=p_n^{-}(t_{h,n}),\qquad v_n^{+}(0)=v_n^{-}(t_{h,n})$$</div></div>
-      </div>
-    </div>
+    <div class="figure-card wide reveal">
+<svg viewBox="-130 -280 1130 420" role="img" aria-label="Asynchronous trajectory preparation and scheduled handoff timing diagram" style="width:100%;height:auto;display:block">
+<defs>
+<marker id="fdarr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1D4E89"/></marker>
+</defs>
+<style>
+.fd-txt{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.fd-row{font-size:12px;font-weight:600;fill:#0E1730}
+.fd-t1{font-size:11px;font-weight:600;fill:#0E1730}
+.fd-t2{font-size:10px;fill:#44506A}
+.fd-evt{font-size:9.5px;fill:#0E1730;font-weight:600}
+.fd-evt2{font-size:9px;fill:#44506A}
+.fd-bdg{font-size:10px;fill:#0E1730;font-weight:600}
+.fd-cap{font-size:9.5px;fill:#0E1730}
+</style>
+<!-- row labels -->
+<text class="fd-txt fd-row" x="5.8" y="-235.9" text-anchor="end">Execution</text>
+<text class="fd-txt fd-row" x="5.8" y="-149" text-anchor="end">Prediction</text>
+<text class="fd-txt fd-row" x="5.8" y="-79.3" text-anchor="end">Geometry</text>
 
-    <div class="fd-wrap reveal" style="margin-top:22px">
-      <div class="hv-head" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <span class="hv-title" style="font-family:var(--font-m);font-size:12px;color:var(--muted);letter-spacing:.6px">TIMESTAMPED PREPARATION &amp; SCHEDULED HANDOFF</span>
-        <span class="tag-pill pill-blue">示意 · 非实测延迟</span>
-      </div>
-      <svg viewBox="0 0 860 300" role="img" aria-label="带时间戳的轨迹准备与预定交接时序图">
-        <defs>
-          <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#4A5A74"/></marker>
-          <marker id="arrB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1D6FF2"/></marker>
-        </defs>
-        <text x="10" y="40" fill="#5A6577" font-size="12" font-family="var(--font-b)">执行 Execution</text>
-        <text x="10" y="130" fill="#5A6577" font-size="12" font-family="var(--font-b)">预测 Prediction</text>
-        <text x="10" y="205" fill="#5A6577" font-size="12" font-family="var(--font-b)">几何 Geometry</text>
-        <rect x="40" y="26" width="600" height="40" rx="8" fill="#EAF0FB" stroke="#AFC4E8"/>
-        <text x="340" y="50" fill="#0E1730" font-size="12.5" font-family="var(--font-b)">执行已提交轨迹 Track committed trajectory</text>
-        <rect x="640" y="26" width="170" height="40" rx="8" fill="#CDE2FF" stroke="#1D6FF2"/>
-        <text x="690" y="50" fill="#0B3B8F" font-size="12.5" font-family="var(--font-b)">执行已接受更新</text>
-        <rect x="110" y="112" width="110" height="40" rx="8" fill="#FFF3E0" stroke="#E5B56B"/>
-        <text x="133" y="135" fill="#7A4D0D" font-size="11.5" font-family="var(--font-b)">提示词改写</text>
-        <rect x="240" y="112" width="150" height="40" rx="8" fill="#E8F0FE" stroke="#1D6FF2"/>
-        <text x="272" y="129" fill="#0B3B8F" font-size="11.5" font-family="var(--font-b)">条件 + 截断 H3</text>
-        <text x="285" y="144" fill="#5A6577" font-size="10" font-family="var(--font-m)">cond. + truncated H3</text>
-        <rect x="410" y="112" width="70" height="40" rx="8" fill="#E8F0FE" stroke="#1D6FF2"/>
-        <text x="424" y="135" fill="#0B3B8F" font-size="11.5" font-family="var(--font-b)">位姿头</text>
-        <rect x="500" y="112" width="120" height="40" rx="8" fill="#E8F0FE" stroke="#1D6FF2"/>
-        <text x="522" y="135" fill="#0B3B8F" font-size="11.5" font-family="var(--font-b)">规划 + 校验</text>
-        <rect x="140" y="187" width="180" height="34" rx="8" fill="#EAFBF8" stroke="#2AA5A0"/>
-        <text x="170" y="208" fill="#0B6E6A" font-size="11.5" font-family="var(--font-b)">MoGe2 + 几何传输</text>
-        <path d="M220 152 H240" stroke="#4A5A74" stroke-width="2" marker-end="url(#arr)"/>
-        <path d="M390 152 H410" stroke="#4A5A74" stroke-width="2" marker-end="url(#arr)"/>
-        <path d="M320 204 C 400 204, 390 160, 445 152" stroke="#4A5A74" stroke-width="2" fill="none" marker-end="url(#arr)"/>
-        <path d="M480 152 H500" stroke="#4A5A74" stroke-width="2" marker-end="url(#arr)"/>
-        <path d="M620 132 H640" stroke="#4A5A74" stroke-width="2" stroke-dasharray="4 5" marker-end="url(#arrB)"/>
-        <path d="M640 132 V66" stroke="#4A5A74" stroke-width="2" marker-end="url(#arrB)"/>
-        <text x="630" y="103" fill="#8A94A6" font-size="10.5" font-family="var(--font-b)">就绪 · 等待交接</text>
-        <path d="M40 250 L820 250" stroke="#C9D4E3" stroke-width="1.5" marker-end="url(#arr)"/>
-        <text x="828" y="254" fill="#8A94A6" font-size="11" font-family="var(--font-b)">时间 Time</text>
-        <g font-size="11.5" font-family="var(--font-m)" fill="#0E1730">
-          <line x1="40" y1="250" x2="40" y2="244" stroke="#C9D4E3" stroke-width="1.5"/><text x="30" y="270">tₙ</text>
-          <line x1="110" y1="250" x2="110" y2="244" stroke="#C9D4E3" stroke-width="1.5"/><text x="100" y="270">uₙ</text>
-          <line x1="620" y1="250" x2="620" y2="244" stroke="#C9D4E3" stroke-width="1.5"/><text x="610" y="270">rₙ</text>
-          <line x1="640" y1="250" x2="640" y2="244" stroke="#C9D4E3" stroke-width="1.5"/><text x="630" y="270">t_{h,n}</text>
-          <line x1="810" y1="250" x2="810" y2="244" stroke="#C9D4E3" stroke-width="1.5"/><text x="800" y="270">eₙ</text>
-        </g>
-        <path d="M110 288 L810 288" stroke="#1D6FF2" stroke-width="2" marker-start="url(#arrB)" marker-end="url(#arrB)"/>
-        <text x="430" y="286" fill="#0B3B8F" font-size="12" font-family="var(--font-d)">Bₙ = eₙ − uₙ（飞行时间预算）</text>
-        <path d="M720 288 L810 288" stroke="#F2A33C" stroke-width="2" marker-start="url(#arrB)" marker-end="url(#arrB)"/>
-        <text x="700" y="283" fill="#D97E12" font-size="11" font-family="var(--font-d)">Rₙ</text>
-        <line x1="720" y1="278" x2="720" y2="298" stroke="#F2A33C" stroke-width="1.5"/>
-        <text x="548" y="283" fill="#8A94A6" font-size="10.5" font-family="var(--font-b)">回退决策不晚于 eₙ − Rₙ</text>
-      </svg>
-      <p class="fd-cap">几何分支与提示词改写同时启动；位姿头等待几何与预测特征就绪。按时接受的更新在预定交接 t<sub>h,n</sub> 前完成准备，拍摄时刻 t<sub>n</sub> 始终是坐标落地的参考；迟到或失效的结果须重新对齐校验后才能激活。<span class="src">（据论文 FastDreamer 时序图重建，横向间距仅为示意）</span></p>
-    </div>
+<!-- execution bars -->
+<rect x="29" y="-256" width="667" height="40.6" rx="2" fill="#E5EFFB" stroke="#1D4E89" stroke-width="1.1"/>
+<text class="fd-txt fd-t1" x="362.5" y="-231" text-anchor="middle">Track committed trajectory</text>
+<rect x="696" y="-256" width="261" height="40.6" rx="2" fill="#C2D9F0" stroke="#1D4E89" stroke-width="1.1"/>
+<text class="fd-txt fd-t1" x="826.5" y="-231" text-anchor="middle">Track accepted update</text>
+<text class="fd-txt fd-cap" x="696" y="-272" text-anchor="middle">Recheck validity</text>
+<text class="fd-txt fd-cap" x="696" y="-261" text-anchor="middle">before activation</text>
+
+<!-- prediction modules -->
+<rect x="98.6" y="-173.6" width="127.6" height="49.3" rx="2.5" fill="#E9F2FB" stroke="#1D4E89" stroke-width="1.1"/>
+<text class="fd-txt fd-t1" x="162.4" y="-160" text-anchor="middle">Prompt rewriting</text>
+<text class="fd-txt fd-t2" x="162.4" y="-146" text-anchor="middle">Reused VLM weights</text>
+<rect x="249.4" y="-173.6" width="174" height="49.3" rx="2.5" fill="#E9F2FB" stroke="#1D4E89" stroke-width="1.1"/>
+<text class="fd-txt fd-t1" x="336.4" y="-160" text-anchor="middle">Conditioning + backbone</text>
+<text class="fd-txt fd-t2" x="336.4" y="-146" text-anchor="middle">DiffWAM: 4 evaluations</text>
+<text class="fd-txt fd-t2" x="336.4" y="-133" text-anchor="middle">Flash: 1 evaluation</text>
+<rect x="443.7" y="-173.6" width="58" height="49.3" rx="2.5" fill="#E9F2FB" stroke="#1D4E89" stroke-width="1.1"/>
+<text class="fd-txt fd-t1" x="472.7" y="-160" text-anchor="middle">Pose</text>
+<text class="fd-txt fd-t1" x="472.7" y="-146" text-anchor="middle">readout</text>
+<rect x="522" y="-173.6" width="69.6" height="49.3" rx="2.5" fill="#E9F2FB" stroke="#1D4E89" stroke-width="1.1"/>
+<text class="fd-txt fd-t1" x="556.8" y="-160" text-anchor="middle">Plan +</text>
+<text class="fd-txt fd-t1" x="556.8" y="-146" text-anchor="middle">validate</text>
+
+<!-- geometry module -->
+<rect x="98.6" y="-99.6" width="290" height="40.6" rx="2.5" fill="#E9F2FB" stroke="#1D4E89" stroke-width="1.1"/>
+<text class="fd-txt fd-t1" x="243.6" y="-75" text-anchor="middle">LiDAR point-cloud processing + geometry transfer</text>
+
+<!-- dependency arrows -->
+<line x1="226.2" y1="-149" x2="247" y2="-149" stroke="#1D4E89" stroke-width="1.6" marker-end="url(#fdarr)"/>
+<line x1="423.4" y1="-149" x2="441.3" y2="-149" stroke="#1D4E89" stroke-width="1.6" marker-end="url(#fdarr)"/>
+<line x1="501.7" y1="-149" x2="519.6" y2="-149" stroke="#1D4E89" stroke-width="1.6" marker-end="url(#fdarr)"/>
+<polyline points="388.6,-79.3 472.7,-79.3 472.7,-171.2" fill="none" stroke="#1D4E89" stroke-width="1.6" marker-end="url(#fdarr)"/>
+
+<!-- ready point and wait -->
+<line x1="591.6" y1="-149" x2="694" y2="-149" stroke="#1D4E89" stroke-width="1.4" stroke-dasharray="1,5" stroke-linecap="round"/>
+<circle cx="591.6" cy="-149" r="2.2" fill="#1D4E89"/>
+<text class="fd-txt fd-cap" x="643.8" y="-160.5" text-anchor="middle">Ready; wait</text>
+<text class="fd-txt fd-cap" x="643.8" y="-150.5" text-anchor="middle">for handoff</text>
+<line x1="696" y1="-149" x2="696" y2="-213.6" stroke="#1D4E89" stroke-width="1.6" marker-end="url(#fdarr)"/>
+
+<!-- time axis -->
+<line x1="17.4" y1="-30" x2="974.4" y2="-30" stroke="#1D4E89" stroke-width="1.6" marker-end="url(#fdarr)"/>
+<text class="fd-txt fd-row" x="978" y="-27">Time</text>
+
+<!-- ticks + event labels -->
+<g stroke="#1D4E89" stroke-width="1.2">
+<line x1="29" y1="-34" x2="29" y2="-26"/>
+<line x1="98.6" y1="-34" x2="98.6" y2="-26"/>
+<line x1="591.6" y1="-34" x2="591.6" y2="-26"/>
+<line x1="696" y1="-34" x2="696" y2="-26"/>
+<line x1="928" y1="-34" x2="928" y2="-26"/>
+</g>
+<text class="fd-txt fd-evt" x="29" y="-14" text-anchor="middle">t&#8346;</text>
+<text class="fd-txt fd-evt2" x="29" y="-2" text-anchor="middle">Capture</text>
+<text class="fd-txt fd-evt" x="98.6" y="-14" text-anchor="middle">u&#8346;</text>
+<text class="fd-txt fd-evt2" x="98.6" y="-2" text-anchor="middle">Launch</text>
+<text class="fd-txt fd-evt" x="591.6" y="-14" text-anchor="middle">r&#8346;</text>
+<text class="fd-txt fd-evt2" x="591.6" y="-2" text-anchor="middle">Update ready</text>
+<text class="fd-txt fd-evt" x="696" y="-14" text-anchor="middle">t&#8343;,&#8346;</text>
+<text class="fd-txt fd-evt2" x="696" y="-2" text-anchor="middle">Handoff</text>
+<text class="fd-txt fd-evt" x="928" y="-14" text-anchor="middle">e&#8346;</text>
+<text class="fd-txt fd-evt2" x="928" y="-2" text-anchor="middle">Old-plan expiry</text>
+
+<!-- budget B_n -->
+<line x1="98.6" y1="-95" x2="928" y2="-95" stroke="#44506A" stroke-width="1.6" marker-start="url(#fdarr)" marker-end="url(#fdarr)"/>
+<text class="fd-txt fd-bdg" x="513.3" y="-89" text-anchor="middle" style="paint-order:stroke" stroke="#FFFFFF" stroke-width="4">B&#8346; = e&#8346; &#8722; u&#8346;</text>
+
+<!-- fallback reserve R_n -->
+<line x1="817.8" y1="-137.3" x2="928" y2="-137.3" stroke="#1D4E89" stroke-width="1.6" marker-start="url(#fdarr)" marker-end="url(#fdarr)"/>
+<text class="fd-txt fd-bdg" x="872.9" y="-131" text-anchor="middle" style="paint-order:stroke" stroke="#FFFFFF" stroke-width="4">R&#8346;</text>
+<text class="fd-txt fd-cap" x="794.6" y="-137.3" text-anchor="end">Fallback decision deadline</text>
+<line x1="817.8" y1="-119.9" x2="817.8" y2="-153" stroke="#9AA7B8" stroke-width="1.1" stroke-dasharray="4,4"/>
+<line x1="928" y1="-108.3" x2="928" y2="-153" stroke="#9AA7B8" stroke-width="1.1" stroke-dasharray="4,4"/>
+<text class="fd-txt fd-evt" x="817.8" y="-160" text-anchor="middle">e&#8346; &#8722; R&#8346;</text>
+</svg>
+<p class="fig-cap"><b>异步轨迹准备与预定交接。</b> 无人机跟踪当前已提交轨迹时，提示词改写与基于 LiDAR 的几何准备并行进行。预测骨干、位姿读出、规划与校验在 rₙ 时刻产生就绪的候选更新。DiffWAM 执行四次骨干前向，DiffWAM-Flash 执行一次；两者均在最后一次前向的 DiT 第 35 号块后退出，不解码未来视频。提前就绪的候选轨迹等待至预定交接时刻 tₕ,ₙ，重新检查有效性后才激活。剩余预算为 Bₙ = eₙ − uₙ；若无法激活有效更新，最迟应在 eₙ − Rₙ 时刻作出回退决策。本图示意候选提前就绪的情况，水平距离不表示实际测量时间。<span class="src">（图 · fig:async）</span></p>
+    </div></div>
   </div>
 </section>
 
