@@ -86,6 +86,14 @@ section{scroll-margin-top:76px}
 .hero-keywords{text-align:center;font-size:14px;color:var(--on-muted);margin-top:28px}
 .hero-keywords b{color:var(--on-dark);font-weight:600}
 .hero-abstract .lead{color:var(--on-dark);font-weight:500}
+.hero-links{margin-top:26px;display:flex;justify-content:center}
+.btn-paper{display:inline-flex;align-items:center;gap:10px;padding:11px 22px;border:1px solid rgba(242,163,60,.55);border-radius:999px;background:rgba(242,163,60,.08);color:var(--amber);font-family:var(--font-d);font-size:14.5px;font-weight:600;text-decoration:none;transition:background .2s,transform .2s}
+.btn-paper:hover{background:rgba(242,163,60,.16);transform:translateY(-1px)}
+.btn-paper .bp-id{font-family:var(--font-m);font-size:12px;color:var(--on-muted);border:1px solid rgba(234,242,253,.25);border-radius:999px;padding:2px 9px}
+.mm-results{display:flex;flex-wrap:wrap;gap:14px;margin-top:22px}
+.mr{flex:1 1 150px;min-width:150px;background:linear-gradient(160deg,var(--hero-0),var(--hero-1));border:1px solid rgba(234,242,253,.14);border-radius:var(--radius);padding:16px 14px;text-align:center;color:var(--on-dark)}
+.mr b{display:block;font-family:var(--font-d);font-size:22px;font-weight:700;color:var(--amber);line-height:1.2}
+.mr span{display:block;font-size:11.5px;color:#C9D8EE;margin-top:5px;line-height:1.45}
 .hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:28px auto 0;max-width:900px}
 .stat{background:rgba(234,242,253,.05);border:1px solid var(--on-line);border-radius:14px;padding:14px 16px;transition:transform .2s,background .2s}
 .stat:hover{transform:translateY(-3px);background:rgba(234,242,253,.09)}
@@ -313,6 +321,8 @@ pre.bib .c{color:#7C8DB0}
         <div class="stat"><b class="num">5<span class="u"> s</span></b><span>预测时域 · 38 个未来位姿 + 初始位姿共 39 个</span></div>
         <div class="stat"><b class="num">3.52–4.31<span class="u">×</span></b><span>DiffWAM-Flash 相对 DiffWAM 的 P50 推理加速（2×/8× H20）</span></div>
         <div class="stat"><b class="num">&gt;100<span class="u">%</span></b><span>FastDreamer 整体推理速度提升（论文引言口径）</span></div>
+      <div class="hero-links">
+        <a class="btn-paper" href="https://arxiv.org/abs/2609.39763" target="_blank" rel="noopener">论文 &middot; arXiv<span class="bp-id">2609.39763</span></a>
       </div>
     </div>
   </div>
@@ -402,21 +412,25 @@ pre.bib .c{color:#7C8DB0}
 
         <div class="mm-grid" style="margin-top:22px">
       <div class="mm-card reveal">
-        <h4><span class="chip">τ&#770;</span>问题定义</h4>
-        <p>五秒时域表示为<b> 38 个相机位姿</b>（姿态 + 位置），表达在初始相机坐标系；加上单位初始位姿共 39 个。位姿是从生成器预测状态解码出的运动提议，而非经过碰撞校验的可执行指令 &mdash; 插值与可执行轨迹构建由下游执行模块完成。</p>
+        <h4><span class="chip">1</span>一次截断前向</h4>
+        <p>从<b>冻结</b>视频生成器读取多层预测特征 &mdash; 部署时从不执行完整视频生成。</p>
       </div>
       <div class="mm-card reveal">
-        <h4><span class="chip">&#8464;</span>高效的预测读出</h4>
-        <p>生成器的迭代生成流程<b>从不完整执行</b>：一次截断前向即返回多层预测特征（层 15 / 25 / 35，5,376 &rarr; 512 维）与干净观测锚点，同时冻结的几何估计器（MoGe2）从同一张初始图像读出首帧几何。部署阶段无需未来视频解码，也无需多帧几何重建。</p>
+        <h4><span class="chip">2</span>Grid-Motion 与 Latent2Pose</h4>
+        <p><b>39</b> 个视频时间槽 &rarr; <b>312</b> 个运动记忆 token，结合首帧几何解码出 <b>38</b> 个带米制尺度的未来位姿。</p>
       </div>
       <div class="mm-card reveal">
-        <h4><span class="chip">M</span>Grid-Motion 与 Latent2Pose</h4>
-        <p>Grid-Motion 在池化前建立带时间戳与几何条件的锚点关联，将<b> 39 个视频时间槽化为 312 个运动记忆 token</b>；Latent2Pose 再结合首帧几何（以有效深度中位数为场景尺度 <i>s</i><sub>0</sub>），用 38 个可学习位姿查询解码出连续、米制尺度的 SE(3) 轨迹。</p>
+        <h4><span class="chip">3</span>几何引导蒸馏</h4>
+        <p>离线教师（完整视频 + MoGe2 深度）标定尺度；部署只用早期特征与首帧几何。</p>
       </div>
-      <div class="mm-card reveal">
-        <h4><span class="chip">L</span>几何引导蒸馏</h4>
-        <p>训练是非对称的：离线教师重建<b>完整生成视频</b>（Pi3）并用 MoGe2 深度标定尺度；学生只看到早期特征与首帧几何。尺度归一化的位置损失加上 SO(3) 测地旋转损失训练读出器 &mdash; 完整视频生成与重建始终留在部署路径之外。</p>
-      </div>
+    </div>
+
+    <div class="mm-results reveal">
+      <div class="mr"><b>39</b><span>位姿 &middot; 5 秒时域</span></div>
+      <div class="mr"><b>312</b><span>运动记忆 token</span></div>
+      <div class="mr"><b>0.3492 m</b><span>轨迹 RMSE</span></div>
+      <div class="mr"><b>74.40%</b><span>端点成功率</span></div>
+      <div class="mr"><b>3.52&ndash;4.31&times;</b><span>Flash 加速</span></div>
     </div>
 
     <div class="figure-card wide reveal" style="margin-top:22px">
@@ -789,11 +803,14 @@ pre.bib .c{color:#7C8DB0}
   title        = {DiffWAM: A Fast and Efficient Navigation World Action Model},
   author       = {Zhu, Mo and Wu, Yuze and Huang, Xijie and Cui, Xiao and Gao, Fei and Zhou, Xin},
   year         = {2026},
-  note         = {Preprint}
-}
-<span class="c">% arXiv ID 与发表 venue 请按正式发表记录补全</span></pre>
+  eprint       = {2609.39763},
+  archivePrefix= {arXiv},
+  primaryClass = {cs.RO},
+  url          = {https://arxiv.org/abs/2609.39763}
+
+}</pre>
     </div>
-    <p class="bib-note">标题、完整作者名单与年份取自论文源稿（VLA-AN-style.sty）；正式发表后请补充 arXiv ID 与会议 / 期刊信息。</p>
+    <p class="bib-note">标题、完整作者名单与年份取自论文源稿（VLA-AN-style.sty）。论文：<a href="https://arxiv.org/abs/2609.39763" target="_blank" rel="noopener">arXiv:2609.39763</a>。</p>
   </div>
 </section>
 </main>
@@ -1043,5 +1060,18 @@ pre.bib .c{color:#7C8DB0}
 })();
 </script>
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script>
+  /* Hide the visitor-stats row only if the counter fails to load (offline / ad-block). */
+  (function () {
+    var el = document.getElementById('busuanzi_value_site_pv');
+    if (!el) return;
+    setTimeout(function () {
+      if (el.textContent.trim() === '' || el.textContent.trim() === '0') {
+        var row = document.querySelector('.f-stat');
+        if (row) row.style.display = 'none';
+      }
+    }, 6000);
+  })();
+</script>
 </body>
 </html>
