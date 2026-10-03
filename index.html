@@ -757,14 +757,20 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
   <div class="container">
     <div class="sec-head reveal">
       <div class="sec-eyebrow">SITE STATISTICS</div>
-      <h2>Visitor statistics &amp; country distribution</h2>
-      <p>Live dashboard from GoatCounter &mdash; total visits, unique visitors and where visitors come from.</p>
+      <h2>Live visitor stats</h2>
+      <p>Counted with GoatCounter &mdash; no login needed. Full country breakdown lives on the dashboard.</p>
     </div>
-    <div class="figure-card wide reveal">
-      <iframe src="https://zzmmzzm.goatcounter.com?hideui=1&p=.total&ge=1" style="width:100%;height:520px;border:0;border-radius:10px" loading="lazy" title="GoatCounter statistics"></iframe>
+    <div class="hero-stats reveal" style="grid-template-columns:repeat(3,1fr);margin-bottom:6px;max-width:760px">
+      <div class="stat"><b id="gc_total">&hellip;</b><span>Total visits</span></div>
+      <div class="stat"><b id="gc_country">&hellip;</b><span>Latest visitor country</span></div>
+      <div class="stat"><a href="https://zzmmzzm.goatcounter.com" target="_blank" rel="noopener" style="color:#fff;text-decoration:none;display:block;height:100%"><b style="font-size:18px;padding-top:8px;color:#9CC3F5">Full breakdown</b><span>Country distribution &nearr;</span></a></div>
     </div>
   </div>
 </section>
+
+
+
+
 
 <footer>
   <div class="container">
@@ -1023,5 +1029,30 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
   })();
 </script>
 <script data-goatcounter="https://zzmmzzm.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+<script>
+(function(){
+  var t = document.getElementById('gc_total');
+  if (t) {
+    fetch('https://zzmmzzm.goatcounter.com/counter/TOTAL.json', {cache: 'no-store'})
+      .then(function(r){ return r.json(); })
+      .then(function(d){ if (d && d.count) t.textContent = d.count; })
+      .catch(function(){});
+  }
+  var c = document.getElementById('gc_country');
+  if (c) {
+    fetch('https://ipwho.is/')
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (d && d.success !== false && d.country) {
+          c.textContent = (d.country_flag ? d.country_flag + ' ' : '') + d.country;
+        }
+      })
+      .catch(function(){});
+  }
+})();
+</script>
+
+
+
 </body>
 </html>
