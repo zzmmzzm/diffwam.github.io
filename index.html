@@ -780,6 +780,220 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
 <script src="assets/lib/echarts.min.js"></script>
 <script src="assets/lib/katex.min.js"></script>
 <script src="assets/lib/auto-render.min.js"></script>
+<script>
+(function(){
+  "use strict";
+  /* ===== nav ===== */
+  var nav=document.getElementById('nav'),burger=document.getElementById('navBurger'),panel=document.getElementById('navPanel');
+  function onScroll(){nav.classList.toggle('is-solid',window.scrollY>40);}
+  window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+  burger.addEventListener('click',function(){
+    var open=panel.classList.toggle('open');
+    burger.setAttribute('aria-expanded',open?'true':'false');
+  });
+  panel.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){panel.classList.remove('open');});});
+
+  /* ===== reveal ===== */
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
+
+  /* ===== bibtex copy ===== */
+  var bibCode=document.getElementById('bibCode'),bibCopy=document.getElementById('bibCopy'),toast=document.getElementById('toast');
+  function getBibText(){
+    var t=bibCode.textContent.replace(/\s*%[^\n]*/g,'').replace(/\n{2,}/g,'\n').trim();
+    return t+'\n';
+  }
+  bibCopy.addEventListener('click',function(){
+    var text=getBibText();
+    function done(ok){toast.textContent=ok?'BibTeX copied to clipboard':'Copy failed — select the text manually';toast.classList.add('show');setTimeout(function(){toast.classList.remove('show');},1800);}
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){done(true);},function(){fallback();});
+    }else{fallback();}
+    function fallback(){
+      var ta=document.createElement('textarea');
+      ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+      document.body.appendChild(ta);ta.select();
+      try{done(document.execCommand('copy'));}catch(e){done(false);}
+      document.body.removeChild(ta);
+    }
+  });
+
+  /* ===== chart theme ===== */
+  var C_BLUE='#1D6FF2',C_AMBER='#F2A33C',C_TEAL='#0FA3A0',C_GRAY='#94A3B8',C_LINE='#E2E8F1',C_INK='#0E1730',C_MUT='#5A6577';
+  var baseFont='Noto Sans SC,-apple-system,"PingFang SC",sans-serif';
+  function tooltip(){
+    return {backgroundColor:'#0E1730',borderColor:'#0E1730',textStyle:{color:'#EAF2FD',fontSize:12,fontFamily:baseFont},confine:true,extraCssText:'box-shadow:0 10px 26px rgba(14,23,48,.25);border-radius:10px;'};
+  }
+  function axisCommon(cat){
+    return {
+      grid:{left:44,right:18,top:34,bottom:44},
+      tooltip:tooltip(),
+      xAxis:{type:'category',data:cat,axisLine:{lineStyle:{color:C_LINE}},axisTick:{show:false},axisLabel:{color:C_MUT,fontFamily:baseFont,fontSize:11.5}},
+      yAxis:{type:'value',axisLabel:{color:C_MUT,fontFamily:baseFont,fontSize:11.5,formatter:'{value}'},splitLine:{lineStyle:{color:'#EDF1F7'}}},
+      legend:{top:2,textStyle:{color:C_MUT,fontFamily:baseFont,fontSize:12},itemWidth:14,itemHeight:9},
+      animationDuration:700
+    };
+  }
+  var charts=[];
+  function make(id){var el=document.getElementById(id);if(!el)return null;var c=echarts.init(el);charts.push(c);return c;}
+
+  /* benchmark grouped bar */
+  var c1=make('chartBenchmark');
+  if(c1){
+    c1.setOption(Object.assign(axisCommon(['IndoorUAV-VLA','UAV-FLOW-Sim','DiffWAM-1000']),{
+      legend:{top:2,textStyle:{color:C_MUT,fontFamily:baseFont,fontSize:12},itemWidth:14,itemHeight:9},
+      color:[C_GRAY,'#B9C7DA','#8FA3C4',C_TEAL,C_BLUE],
+      series:[
+        {name:'WorldVLN',type:'bar',barWidth:15,data:[39.32,80.24,58.40]},
+        {name:'ImagineUAV',type:'bar',barWidth:15,data:[33.78,69.65,43.20]},
+        {name:'Fast-WAM-UAV',type:'bar',barWidth:15,data:[35.69,71.27,52.20]},
+        {name:'WorldFly',type:'bar',barWidth:15,data:[25.71,53.98,30.50]},
+        {name:'DiffWAM (ours)',type:'bar',barWidth:15,data:[56.77,91.42,74.40],
+          itemStyle:{color:C_BLUE,borderRadius:[5,5,0,0]},
+          label:{show:true,position:'top',color:C_INK,fontFamily:baseFont,fontWeight:600,fontSize:11}}
+      ],
+      yAxis:{type:'value',max:100,axisLabel:{color:C_MUT,fontFamily:baseFont,fontSize:11.5,formatter:'{value}%'},splitLine:{lineStyle:{color:'#EDF1F7'}}}
+    }));
+  }
+
+  /* family comparison */
+  var c2=make('chartFamily');
+  if(c2){
+    c2.setOption(Object.assign(axisCommon(['Basic Motion','Object Interaction','Spatial Navigation','Scene Understanding']),{
+      color:[C_GRAY,C_BLUE],
+      series:[
+        {name:'Strongest baseline (BM/OI/SN=WorldVLN, SU=ImagineUAV)',type:'bar',barWidth:26,data:[86.00,56.62,50.77,56.00],itemStyle:{color:C_GRAY,borderRadius:[5,5,0,0]}},
+        {name:'DiffWAM',type:'bar',barWidth:26,data:[92.00,70.35,74.03,84.00],
+          itemStyle:{color:C_BLUE,borderRadius:[5,5,0,0]},
+          label:{show:true,position:'top',color:C_INK,fontFamily:baseFont,fontWeight:600,fontSize:11}}
+      ],
+      yAxis:{type:'value',max:100,axisLabel:{color:C_MUT,fontFamily:baseFont,fontSize:11.5,formatter:'{value}%'},splitLine:{lineStyle:{color:'#EDF1F7'}}}
+    }));
+  }
+
+  /* latency horizontal bar */
+  var c3=make('chartLatency');
+  if(c3){
+    var cfg=[['DiffWAM\n2× H20',11.199,11.273,false],['Flash\n2× H20',3.182,3.242,true],['DiffWAM\n8× H20',3.605,3.820,false],['Flash\n8× H20',0.835,0.912,true],['DiffWAM\nAGX Thor',1.796,1.851,false],['Flash\nAGX Thor',1.080,1.101,true]];
+    c3.setOption({
+      grid:{left:104,right:44,top:30,bottom:26},
+      tooltip:tooltip(),
+      legend:{top:2,textStyle:{color:C_MUT,fontFamily:baseFont,fontSize:12},itemWidth:14,itemHeight:9},
+      xAxis:{type:'value',name:'s',nameTextStyle:{color:C_MUT,fontSize:11},axisLabel:{color:C_MUT,fontFamily:baseFont,fontSize:11.5},splitLine:{lineStyle:{color:'#EDF1F7'}}},
+      yAxis:{type:'category',data:cfg.map(function(r){return r[0];}),axisLine:{lineStyle:{color:C_LINE}},axisTick:{show:false},axisLabel:{color:C_INK,fontFamily:baseFont,fontSize:11.5,lineHeight:14}},
+      series:[
+        {name:'P50',type:'bar',barWidth:10,data:cfg.map(function(r){return r[1];}),itemStyle:{color:function(p){return cfg[p.dataIndex][3]?C_AMBER:C_GRAY;},borderRadius:[0,4,4,0]}},
+        {name:'P95',type:'bar',barWidth:10,data:cfg.map(function(r){return r[2];}),itemStyle:{color:function(p){return cfg[p.dataIndex][3]?'#D97E12':'#8FA3C4';},borderRadius:[0,4,4,0]}}
+      ]
+    });
+  }
+
+  /* pipeline total horizontal bars */
+  var c4=make('chartPipeline');
+  if(c4){
+    c4.setOption({
+      grid:{left:112,right:56,top:26,bottom:26},
+      tooltip:tooltip(),
+      xAxis:{type:'value',axisLabel:{color:C_MUT,fontFamily:baseFont,fontSize:11.5,formatter:'{value} ms'},splitLine:{lineStyle:{color:'#EDF1F7'}}},
+      yAxis:{type:'category',data:['NavDreamer\n8× H20','Pure Video Gen\n8× H20','DiffWAM\n8× H20','DiffWAM-Flash\n8× H20','DiffWAM-Flash\nAGX Thor'],axisLine:{lineStyle:{color:C_LINE}},axisTick:{show:false},axisLabel:{color:C_INK,fontFamily:baseFont,fontSize:11.5,lineHeight:14}},
+      series:[{
+        type:'bar',barWidth:20,data:[
+          {value:10080.2,itemStyle:{color:C_GRAY}},
+          {value:8957.8,itemStyle:{color:'#B9C7DA'}},
+          {value:3605.5,itemStyle:{color:C_BLUE}},
+          {value:835.2,itemStyle:{color:C_AMBER}},
+          {value:1080.4,itemStyle:{color:'#D97E12'}}
+        ],
+        label:{show:true,position:'right',color:C_INK,fontFamily:baseFont,fontWeight:600,fontSize:11}
+      }]
+    });
+  }
+
+  /* architecture readout */
+  var c5=make('chartArch');
+  if(c5){
+    c5.setOption(Object.assign(axisCommon(['WorldVLN','Fast-WAM','Faster-WAM','MLP','DiffWAM (ours)']),{
+      color:[C_BLUE,C_AMBER,C_TEAL],
+      series:[
+        {name:'RMSE',type:'bar',barWidth:11,data:[0.8280,0.8818,0.7011,1.3881,0.3492],itemStyle:{color:C_BLUE,borderRadius:[3,3,0,0]}},
+        {name:'ADE',type:'bar',barWidth:11,data:[0.7103,0.6815,0.5749,1.0729,0.3151],itemStyle:{color:C_AMBER,borderRadius:[3,3,0,0]}},
+        {name:'FDE',type:'bar',barWidth:11,data:[1.2711,1.5395,1.0792,2.6189,0.4357],itemStyle:{color:C_TEAL,borderRadius:[3,3,0,0]}}
+      ],
+      yAxis:{type:'value',name:'est. m',nameTextStyle:{color:C_MUT,fontSize:11},axisLabel:{color:C_MUT,fontFamily:baseFont,fontSize:11.5},splitLine:{lineStyle:{color:'#EDF1F7'}}}
+    }));
+  }
+
+  /* predictive computation */
+  var c6=make('chartCompute');
+  if(c6){
+    c6.setOption(Object.assign(axisCommon(['1','2','3','4']),{
+      legend:{top:2,textStyle:{color:C_MUT,fontFamily:baseFont,fontSize:12},itemWidth:14,itemHeight:9},
+      series:[
+        {name:'RMSE (m)',type:'line',smooth:true,symbolSize:7,data:[0.5012,0.4107,0.3828,0.3492],lineStyle:{width:3,color:C_BLUE},itemStyle:{color:C_BLUE}},
+        {name:'ADE (m)',type:'line',smooth:true,symbolSize:7,data:[0.4423,0.3601,0.3347,0.3151],lineStyle:{width:3,color:C_TEAL},itemStyle:{color:C_TEAL}},
+        {name:'FDE (m)',type:'line',smooth:true,symbolSize:7,data:[0.6865,0.5883,0.5653,0.4357],lineStyle:{width:3,color:C_AMBER},itemStyle:{color:C_AMBER}}
+      ],
+      xAxis:{type:'category',name:'world-model evaluations',nameTextStyle:{color:C_MUT,fontSize:11},data:['1','2','3','4'],axisLine:{lineStyle:{color:C_LINE}},axisTick:{show:false},axisLabel:{color:C_MUT,fontFamily:baseFont,fontSize:11.5}},
+      yAxis:{type:'value',name:'est. m',nameTextStyle:{color:C_MUT,fontSize:11},axisLabel:{color:C_MUT,fontFamily:baseFont,fontSize:11.5},splitLine:{lineStyle:{color:'#EDF1F7'}}}
+    }));
+  }
+
+  /* feature-layer selection */
+  var c9=make('chartLayers');
+  if(c9){
+    c9.setOption(Object.assign(axisCommon(['15/25/35','3/5/7','23/25/27','33/35/37']),{
+      legend:{top:2,textStyle:{color:C_MUT,fontFamily:baseFont,fontSize:12},itemWidth:14,itemHeight:9},
+      series:[
+        {name:'RMSE (m)',type:'bar',barWidth:16,data:[0.3492,0.7250,0.5397,0.3790],itemStyle:{color:C_BLUE,borderRadius:[4,4,0,0]}},
+        {name:'FDE (m)',type:'bar',barWidth:16,data:[0.3151,1.0036,0.7641,0.5562],itemStyle:{color:C_AMBER,borderRadius:[4,4,0,0]}}
+      ],
+      xAxis:{type:'category',name:'DiT layer taps (mixed / early / middle / deep)',nameTextStyle:{color:C_MUT,fontSize:10.5},data:['15/25/35','3/5/7','23/25/27','33/35/37'],axisLine:{lineStyle:{color:C_LINE}},axisTick:{show:false},axisLabel:{color:C_MUT,fontFamily:baseFont,fontSize:11}},
+      yAxis:{type:'value',name:'est. m',nameTextStyle:{color:C_MUT,fontSize:11},axisLabel:{color:C_MUT,fontFamily:baseFont,fontSize:11.5},splitLine:{lineStyle:{color:'#EDF1F7'}}}
+    }));
+  }
+
+  /* data scaling */
+  var c7=make('chartScale');
+  if(c7){
+    c7.setOption(Object.assign(axisCommon(['1,000','4,000','16,000','64,000']),{
+      legend:{top:2,textStyle:{color:C_MUT,fontFamily:baseFont,fontSize:12},itemWidth:14,itemHeight:9},
+      series:[
+        {name:'RMSE (m)',type:'line',smooth:true,symbolSize:7,data:[0.8203,0.6519,0.5465,0.4873],lineStyle:{width:3,color:C_BLUE},itemStyle:{color:C_BLUE},areaStyle:{color:'rgba(29,111,242,.08)'}},
+        {name:'FDE (m)',type:'line',smooth:true,symbolSize:7,data:[1.4011,0.9897,0.7739,0.6884],lineStyle:{width:3,color:C_AMBER},itemStyle:{color:C_AMBER},areaStyle:{color:'rgba(242,163,60,.08)'}}
+      ],
+      xAxis:{type:'category',name:'training pairs (log-spaced)',nameTextStyle:{color:C_MUT,fontSize:11},data:['1,000','4,000','16,000','64,000'],axisLine:{lineStyle:{color:C_LINE}},axisTick:{show:false},axisLabel:{color:C_MUT,fontFamily:baseFont,fontSize:11.5}},
+      yAxis:{type:'value',name:'est. m',nameTextStyle:{color:C_MUT,fontSize:11},axisLabel:{color:C_MUT,fontFamily:baseFont,fontSize:11.5},splitLine:{lineStyle:{color:'#EDF1F7'}}}
+    }));
+  }
+
+  /* compact loss */
+  var c8=make('chartLoss');
+  if(c8){
+    c8.setOption(Object.assign(axisCommon(['Legacy','Two-term · unnorm','Two-term · depth-norm','Selected recipe']),{
+      color:[C_BLUE,C_AMBER],
+      series:[
+        {name:'RMSE (m)',type:'bar',barWidth:14,data:[0.7288,0.8120,1.0728,0.6873],itemStyle:{color:C_BLUE,borderRadius:[4,4,0,0]}},
+        {name:'FDE (m)',type:'bar',barWidth:14,data:[1.0297,1.1451,1.5092,0.9496],itemStyle:{color:C_AMBER,borderRadius:[4,4,0,0]}}
+      ],
+      yAxis:{type:'value',name:'est. m',nameTextStyle:{color:C_MUT,fontSize:11},axisLabel:{color:C_MUT,fontFamily:baseFont,fontSize:11.5},splitLine:{lineStyle:{color:'#EDF1F7'}}}
+    }));
+  }
+
+  /* responsive */
+  var ro=new ResizeObserver(function(){charts.forEach(function(c){c.resize();});});
+  charts.forEach(function(c){ro.observe(c.getDom());});
+
+  /* ===== KaTeX ===== */
+  if(window.renderMathInElement){
+    renderMathInElement(document.body,{
+      delimiters:[{left:'$$',right:'$$',display:true},{left:'\\(',right:'\\)',display:false}],
+      throwOnError:false
+    });
+  }
+})();
+</script>
 
 <script>
   (function () {
