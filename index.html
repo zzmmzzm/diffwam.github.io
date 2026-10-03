@@ -306,7 +306,7 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
         </div>
       </div>
       <figure class="hero-figure reveal">
-        <img loading="lazy" src="assets/DiffWAM_toutu.jpg" alt="DiffWAM predictive-to-motion overview: synthetic dataset, frozen world model, generalization verification and deployment efficiency">
+        <img src="assets/DiffWAM_toutu.jpg" alt="DiffWAM predictive-to-motion overview: synthetic dataset, frozen world model, generalization verification and deployment efficiency">
       </figure>
       <div class="hero-abstract">
         <p><span class="lead">Abstract:</span> pretrained video foundation models encode rich semantic and spatiotemporal priors for embodied navigation, yet converting these priors into UAV motion typically requires expensive future-video synthesis and geometric reconstruction. We investigate whether the motion implicit in future visual prediction can instead be recovered directly from the predictive representations of a frozen video model. To this end, we present <b>DiffWAM</b>, a geometry-conditioned navigation world-action model that directly transforms multi-level predictive features into continuous camera trajectories. Its <b>Grid-Motion</b> module preserves spatial-temporal motion associations, while <b>Latent2Pose</b> grounds them with first-frame geometry to recover metrically meaningful 3D motion. Complete video rollouts and geometric reconstruction are required only for offline supervision, eliminating future-video decoding and multi-frame reconstruction during deployment. We further introduce <b>FastDreamer</b>, which overlaps predictive and geometric computation with ongoing flight and performs timestamp-aware asynchronous trajectory handoff for continuous UAV execution. DiffWAM achieves a trajectory RMSE of <b>0.3492 m</b> and an endpoint success rate of <b>74.40%</b> on the 1,000-sample DiffWAM-1000 benchmark, while representative real-world experiments demonstrate complex behaviors including constrained traversal, orbiting, S-shaped flight, and multi-stage navigation. An onboard DiffWAM-Flash implementation further reaches <b>1.08 s</b> model-pipeline latency on NVIDIA Jetson AGX Thor. These results demonstrate that predictive video representations can be efficiently grounded into continuous 3D motion, providing a direct alternative to generate-then-reconstruct navigation pipelines.</p>
@@ -414,7 +414,7 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
     </div>
 
     <div class="figure-card wide reveal">
-      <img loading="lazy" src="assets/DiffWAM_Pipeline.pdf.png" alt="DiffWAM overview: vision-language inputs, predictive-to-motion decoding, continuous 3D motion output, two-stage training">
+      <img src="assets/DiffWAM_Pipeline.pdf.png" alt="DiffWAM overview: vision-language inputs, predictive-to-motion decoding, continuous 3D motion output, two-stage training">
       <p class="fig-cap"><b>DiffWAM overview.</b> An initial RGB observation and a language instruction condition a frozen video model; one truncated forward yields predictive features, decoded by Grid-Motion and the geometry-conditioned Latent2Pose into a camera-trajectory proposal, with first-frame geometry providing spatial reference and scale. Full video generation and reconstruction are used only by the offline teacher (S0&ndash;S2).<span class="src"> (Fig. 1 · DiffWAM_Pipeline)</span></p>
     </div>
 
@@ -442,7 +442,7 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
     </div>
 
     <div class="figure-card wide reveal" style="margin-top:22px">
-      <img loading="lazy" src="assets/DiffWAM_Internal_model_architecture.pdf.png" alt="DiffWAM internal architecture: multi-level features, spatiotemporal factorization, Grid-Motion, trajectory decoder and offline teacher">
+      <img src="assets/DiffWAM_Internal_model_architecture.pdf.png" alt="DiffWAM internal architecture: multi-level features, spatiotemporal factorization, Grid-Motion, trajectory decoder and offline teacher">
       <p class="fig-cap"><b>DiffWAM internal architecture.</b> Multi-level predictive features (layers 15 / 25 / 35, 5,376 &rarr; 512 dims) are fused and processed by factorized spatiotemporal modules; Grid-Motion builds geometry-conditioned associations before pooling 39 video-time slots into 312 motion-memory tokens; the direct decoder outputs 38 future poses with position / rotation heads. An offline teacher reconstructs complete videos (Pi3) and calibrates scale with MoGe2.<span class="src"> (Fig. 2 · DiffWAM_Internal_model_architecture)</span></p>
     </div>
   </div>
@@ -457,7 +457,7 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
       <p>Parallel proposal preparation, prospective alignment and safety-gated asynchronous handoff overlap inference with ongoing flight.</p>
     </div>
     <div class="figure-card wide reveal">
-      <img loading="lazy" src="assets/FastDreamer_fig_async.png" alt="Figure 4: Asynchronous trajectory preparation and scheduled handoff">
+      <img src="assets/FastDreamer_fig_async.png" alt="Figure 4: Asynchronous trajectory preparation and scheduled handoff">
     </div>
   </div>
 </section>
@@ -502,12 +502,12 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
     </div>
 
     <div class="figure-card wide reveal" style="margin-top:22px">
-      <img loading="lazy" src="assets/uav_flight_task_distribution_editable.pdf.png" alt="3D navigation task distribution: object interaction 65%, spatial navigation 15%, basic motion 10%, scene understanding 10%">
+      <img src="assets/uav_flight_task_distribution_editable.pdf.png" alt="3D navigation task distribution: object interaction 65%, spatial navigation 15%, basic motion 10%, scene understanding 10%">
       <p class="fig-cap"><b>Evaluation task distribution.</b> 18 task types across four families: object interaction 65% (object navigation 30%, orbiting 10%, etc.), spatial navigation 15%, basic motion 10%, scene understanding 10%. Object interaction dominates because language-conditioned target selection and spatial-relation reasoning are at the core of vision-language UAV navigation.<span class="src"> (Fig. 3 · uav_flight_task_distribution)</span></p>
     </div>
 
     <div class="figure-card wide reveal" style="margin-top:22px">
-      <img loading="lazy" src="assets/V40_013_01_separate_figuresv40.jpg" alt="DiffWAM representative trajectory generation: navigation approach, gap crossing, orbiting and landing">
+      <img src="assets/V40_013_01_separate_figuresv40.jpg" alt="DiffWAM representative trajectory generation: navigation approach, gap crossing, orbiting and landing">
       <p class="fig-cap"><b>Representative trajectory generation.</b> Rows 1–4: target-oriented navigation and approach (approach the bicycle from the right, approach the boat and observe its right side, etc.); rows 5–6: constrained gap crossing (turn left and cross the garage passage, curve left and cross the rooftop frame); rows 7–9: full orbits and direction-conditioned half-orbits; row 10: a generated landing sequence. Each visual sequence is accompanied by a top-view trajectory. These examples are used for qualitative analysis, not for estimating overall success rates.<span class="src"> (Fig. 4 · Representative cases)</span></p>
     </div>
   </div>
@@ -523,7 +523,7 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
     </div>
 
     <div class="figure-card wide reveal">
-      <img loading="lazy" src="assets/real_world.jpg" alt="Eight representative real-UAV experiments: orbiting, crossing, S-shaped trajectory, landing and multi-stage tasks">
+      <img src="assets/real_world.jpg" alt="Eight representative real-UAV experiments: orbiting, crossing, S-shaped trajectory, landing and multi-stage tasks">
       <p class="fig-cap"><b>Representative real-UAV experiments.</b> Cases I–IV: orbit the dark blue pillar, pass between the two trees on the left, fly an S-shaped trajectory, pass through the circular frame; Cases V–VI: head toward the wall with the “Differential Robotics” logo, head to the red fire hydrant on the far left; Cases VII–VIII: go around the left side of the tree on the right then land on the yellow mat, pass the left side of the electric fan then reach in front of the rock formation (sequential multi-stage goals). These eight illustrated cases are selected qualitative demonstrations rather than a complete record of evaluation trials; they are not used to infer the number of evaluated episodes, aggregate physical-flight success rates or per-task completion times.<span class="src"> (Fig. 5 · real_world)</span></p>
     </div>
 
@@ -555,42 +555,42 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
     <div class="video-row">
       <div class="video-card reveal">
         <h4>Head toward the wall logo</h4>
-        <video controls preload="none" playsinline src="assets/real_wall_logo.mp4" aria-label="Real-flight demonstration: head toward the wall logo"></video>
+        <video controls preload="metadata" playsinline src="assets/real_wall_logo.mp4" aria-label="Real-flight demonstration: head toward the wall logo"></video>
         <p class="fig-cap">Language-specified target selection: the UAV heads toward the wall with the “Differential Robotics” logo and hovers in front of it.</p>
       </div>
       <div class="video-card reveal">
         <h4>Pass between the two trees</h4>
-        <video controls preload="none" playsinline src="assets/real_two_trees.mp4" aria-label="Real-flight demonstration: pass between the two trees"></video>
+        <video controls preload="metadata" playsinline src="assets/real_two_trees.mp4" aria-label="Real-flight demonstration: pass between the two trees"></video>
         <p class="fig-cap">Constrained traversal: the UAV flies through the narrow space between the two trees on the left.</p>
       </div>
       <div class="video-card reveal">
         <h4>Fly toward the rock formation</h4>
-        <video controls preload="none" playsinline src="assets/real_rock_formation.mp4" aria-label="Real-flight demonstration: fly toward the rock formation"></video>
+        <video controls preload="metadata" playsinline src="assets/real_rock_formation.mp4" aria-label="Real-flight demonstration: fly toward the rock formation"></video>
         <p class="fig-cap">Target-oriented navigation: the UAV flies toward the rock formation in the outdoor scene.</p>
       </div>
       <div class="video-card reveal">
         <h4>Approach the tallest blue pillar</h4>
-        <video controls preload="none" playsinline src="assets/real_blue_pillar.mp4" aria-label="Real-flight demonstration: approach the tallest blue pillar"></video>
+        <video controls preload="metadata" playsinline src="assets/real_blue_pillar.mp4" aria-label="Real-flight demonstration: approach the tallest blue pillar"></video>
         <p class="fig-cap">Object selection: the UAV flies to the front of the tallest blue pillar and stops before it.</p>
       </div>
       <div class="video-card reveal">
         <h4>Left side of the fire extinguisher</h4>
-        <video controls preload="none" playsinline src="assets/real_fire_extinguisher.mp4" aria-label="Real-flight demonstration: left side of the fire extinguisher"></video>
+        <video controls preload="metadata" playsinline src="assets/real_fire_extinguisher.mp4" aria-label="Real-flight demonstration: left side of the fire extinguisher"></video>
         <p class="fig-cap">Spatial grounding: the UAV moves to the left side of the fire extinguisher as instructed.</p>
       </div>
       <div class="video-card reveal">
         <h4>Pass through the circular frame</h4>
-        <video controls preload="none" playsinline src="assets/real_circular_frame.mp4" aria-label="Real-flight demonstration: pass through the circular frame"></video>
+        <video controls preload="metadata" playsinline src="assets/real_circular_frame.mp4" aria-label="Real-flight demonstration: pass through the circular frame"></video>
         <p class="fig-cap">Precise pass-through: the UAV crosses the circular frame ahead without contact.</p>
       </div>
       <div class="video-card reveal">
         <h4>Orbit the pillar with avoidance</h4>
-        <video controls preload="none" playsinline src="assets/real_orbit_avoid.mp4" aria-label="Real-flight demonstration: orbit the pillar with avoidance"></video>
+        <video controls preload="metadata" playsinline src="assets/real_orbit_avoid.mp4" aria-label="Real-flight demonstration: orbit the pillar with avoidance"></video>
         <p class="fig-cap">Orbit with obstacle avoidance: the UAV completes a full loop around the pillar while avoiding obstacles.</p>
       </div>
       <div class="video-card reveal">
         <h4>S-shaped trajectory flight</h4>
-        <video controls preload="none" playsinline src="assets/real_s_shape.mp4" aria-label="Real-flight demonstration: s-shaped trajectory flight"></video>
+        <video controls preload="metadata" playsinline src="assets/real_s_shape.mp4" aria-label="Real-flight demonstration: s-shaped trajectory flight"></video>
         <p class="fig-cap">Trajectory following: the UAV flies forward along an S-shaped trajectory.</p>
       </div>
     </div>
@@ -638,7 +638,7 @@ footer .f-note{margin-top:10px;font-size:12px;color:#64748F}
     </div>
 
     <div class="figure-card wide reveal" style="margin-top:22px">
-      <img loading="lazy" src="assets/h3_latency_breakdown.pdf.png" alt="Inference pipeline stage-wise latency breakdown: NavDreamer, pure video generation, DiffWAM, DiffWAM-Flash">
+      <img src="assets/h3_latency_breakdown.pdf.png" alt="Inference pipeline stage-wise latency breakdown: NavDreamer, pure video generation, DiffWAM, DiffWAM-Flash">
       <p class="fig-cap"><b>Stage-wise latency breakdown.</b> On 8× H20: NavDreamer 10,080.2 ms, pure video generation 8,957.8 ms, DiffWAM 3,605.5 ms, DiffWAM-Flash 835.2 ms; Flash on AGX Thor 1,080.4 ms. Components include vision encoding, LLM prefill, input / VAE encode, video predictive compute, VAE decode, overhead and Pi3 reconstruction. NavDreamer keeps future-video decoding and Pi3 reconstruction; DiffWAM variants drop both.<span class="src"> (Fig. 7 · h3_latency_breakdown)</span></p>
     </div>
   </div>

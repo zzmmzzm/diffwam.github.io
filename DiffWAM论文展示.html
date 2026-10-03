@@ -316,7 +316,7 @@ pre.bib .c{color:#7C8DB0}
         </div>
       </div>
       <figure class="hero-figure reveal">
-        <img loading="lazy" src="assets/DiffWAM_toutu.jpg" alt="DiffWAM 预测到运动总览：合成数据集、冻结世界模型、泛化验证与部署效率">
+        <img src="assets/DiffWAM_toutu.jpg" alt="DiffWAM 预测到运动总览：合成数据集、冻结世界模型、泛化验证与部署效率">
       </figure>
       <div class="hero-abstract">
         <p><span class="lead">摘要：</span>预训练视频基础模型蕴含丰富的语义与时空先验，但将这些先验转化为无人机运动通常需要代价高昂的未来视频生成和几何重建。本文研究能否直接从冻结视频模型的预测表征中恢复未来视觉预测所隐含的运动。为此，我们提出 <b>DiffWAM</b>，一种几何条件导航世界动作模型，可将多层预测特征直接映射为连续相机轨迹。其中，<b>Grid-Motion</b> 保留空间与时间维度上的运动关联，<b>Latent2Pose</b> 结合首帧几何信息，将预测表征进一步映射为具有米制尺度的三维运动。完整视频 rollout 与几何重建仅用于离线监督，因此部署阶段无需未来视频解码和在线多帧几何重建。进一步地，我们提出 <b>FastDreamer</b>，在无人机持续飞行过程中并行执行预测与几何计算，并通过带时间戳的异步轨迹交接实现连续执行。在包含 1,000 个样本的 DiffWAM-1000 基准上，DiffWAM 实现了 <b>0.3492 m</b> 的轨迹 RMSE 和 <b>74.40%</b> 的端点成功率；真实无人机实验进一步展示了受限空间穿越、环绕、S 型飞行以及多阶段导航等复杂运动能力。端侧 DiffWAM-Flash 实现可在 NVIDIA Jetson AGX Thor 上达到 <b>1.08 s</b> 的模型流水线时延。上述结果表明，视频模型的预测表征可以被高效地映射为连续三维运动，为传统“生成视频—几何重建”式导航流程提供了一条更加直接的技术路径。</p>
@@ -424,7 +424,7 @@ pre.bib .c{color:#7C8DB0}
     </div>
 
     <div class="figure-card wide reveal">
-      <img loading="lazy" src="assets/DiffWAM_Pipeline.pdf.png" alt="DiffWAM 总体流程图：视觉语言输入、预测到运动解码、连续3D运动输出、两阶段训练">
+      <img src="assets/DiffWAM_Pipeline.pdf.png" alt="DiffWAM 总体流程图：视觉语言输入、预测到运动解码、连续3D运动输出、两阶段训练">
       <p class="fig-cap"><b>DiffWAM 总体流程。</b> 初始 RGB 观测与语言指令条件化一个冻结视频模型；一次截断前向得到预测特征，由 Grid-Motion 与几何条件 Latent2Pose 解码为相机轨迹提议，首帧几何提供空间参考与尺度。完整视频生成与重建只用于离线教师（S0&ndash;S2）。<span class="src">（图 1 · DiffWAM_Pipeline）</span></p>
     </div>
 
@@ -452,7 +452,7 @@ pre.bib .c{color:#7C8DB0}
     </div>
 
     <div class="figure-card wide reveal" style="margin-top:22px">
-      <img loading="lazy" src="assets/DiffWAM_Internal_model_architecture.pdf.png" alt="DiffWAM 内部模型架构：多层特征、时空分解、Grid-Motion、轨迹解码器与离线教师">
+      <img src="assets/DiffWAM_Internal_model_architecture.pdf.png" alt="DiffWAM 内部模型架构：多层特征、时空分解、Grid-Motion、轨迹解码器与离线教师">
       <p class="fig-cap"><b>DiffWAM 内部架构。</b> 多层预测特征（层 15 / 25 / 35，5,376 &rarr; 512 维）融合后经分解时空模块处理；Grid-Motion 建立几何条件关联，再将 39 个视频时间槽池化为 312 个运动记忆 token；直接解码器以位置 / 旋转头输出 38 个未来位姿。离线教师重建完整视频（Pi3）并用 MoGe2 标定尺度。<span class="src">（图 2 · DiffWAM_Internal_model_architecture）</span></p>
     </div>
   </div>
@@ -467,7 +467,7 @@ pre.bib .c{color:#7C8DB0}
       <p>并行提议准备、前瞻对齐与安全门控交接，把推理与飞行过程重叠起来。</p>
     </div>
     <div class="figure-card wide reveal">
-      <img loading="lazy" src="assets/FastDreamer_fig_async.png" alt="图 4：异步轨迹准备与预定交接">
+      <img src="assets/FastDreamer_fig_async.png" alt="图 4：异步轨迹准备与预定交接">
     </div>
   </div>
 </section>
@@ -512,12 +512,12 @@ pre.bib .c{color:#7C8DB0}
     </div>
 
     <div class="figure-card wide reveal" style="margin-top:22px">
-      <img loading="lazy" src="assets/uav_flight_task_distribution_editable.pdf.png" alt="3D 导航任务分布：物体交互65%、空间导航15%、基础运动10%、场景理解10%">
+      <img src="assets/uav_flight_task_distribution_editable.pdf.png" alt="3D 导航任务分布：物体交互65%、空间导航15%、基础运动10%、场景理解10%">
       <p class="fig-cap"><b>评估任务分布。</b> 18 种任务类型划分为四类：物体交互 65%（目标导航 30%、环绕 10% 等）、空间导航 15%、基础运动 10%、场景理解 10%。物体交互占比最大，因为语言条件下的目标选择与空间关系推理是视觉语言无人机导航的核心。<span class="src">（图 3 · uav_flight_task_distribution）</span></p>
     </div>
 
     <div class="figure-card wide reveal" style="margin-top:22px">
-      <img loading="lazy" src="assets/V40_013_01_separate_figuresv40.jpg" alt="DiffWAM 代表性轨迹生成结果：导航接近、间隙穿越、环绕与降落">
+      <img src="assets/V40_013_01_separate_figuresv40.jpg" alt="DiffWAM 代表性轨迹生成结果：导航接近、间隙穿越、环绕与降落">
       <p class="fig-cap"><b>代表性轨迹生成结果。</b> 第 1–4 行：目标导向导航与接近（从右侧接近自行车、接近船只并观察其右侧等）；第 5–6 行：受限间隙穿越（左转穿越车库通道、左弯穿越屋顶框架）；第 7–9 行：完整环绕与方向条件化半环绕；第 10 行：生成的降落序列。每组视觉序列附俯视轨迹。这些示例用于定性分析，不用于估计总体成功率。<span class="src">（图 4 · 代表性案例）</span></p>
     </div>
   </div>
@@ -533,7 +533,7 @@ pre.bib .c{color:#7C8DB0}
     </div>
 
     <div class="figure-card wide reveal">
-      <img loading="lazy" src="assets/real_world.jpg" alt="八项代表性真实无人机实验：环绕、穿越、S形轨迹、降落与多阶段任务">
+      <img src="assets/real_world.jpg" alt="八项代表性真实无人机实验：环绕、穿越、S形轨迹、降落与多阶段任务">
       <p class="fig-cap"><b>代表性真实无人机实验。</b> 案例 I–IV：环绕深蓝色立柱、穿过左侧两棵树之间、沿 S 形轨迹飞行、穿过圆形框架；案例 V–VI：接近带“微分智飞”标志的墙面、接近最左侧的红色消防栓；案例 VII–VIII：从右侧树木左边绕过再降落黄色垫子、从电风扇左侧绕过再抵达假山前方（依次执行的多阶段目标）。这八项展示案例为精选定性演示，而非全部评估试次的完整记录；不据此推断评估回合数、聚合物理飞行成功率或分任务完成时间。<span class="src">（图 5 · real_world）</span></p>
     </div>
 
@@ -565,42 +565,42 @@ pre.bib .c{color:#7C8DB0}
     <div class="video-row">
       <div class="video-card reveal">
         <h4>Head toward the wall logo</h4>
-        <video controls preload="none" playsinline src="assets/real_wall_logo.mp4" aria-label="Real-flight demonstration: head toward the wall logo"></video>
+        <video controls preload="metadata" playsinline src="assets/real_wall_logo.mp4" aria-label="Real-flight demonstration: head toward the wall logo"></video>
         <p class="fig-cap">Language-specified target selection: the UAV heads toward the wall with the “Differential Robotics” logo and hovers in front of it.</p>
       </div>
       <div class="video-card reveal">
         <h4>Pass between the two trees</h4>
-        <video controls preload="none" playsinline src="assets/real_two_trees.mp4" aria-label="Real-flight demonstration: pass between the two trees"></video>
+        <video controls preload="metadata" playsinline src="assets/real_two_trees.mp4" aria-label="Real-flight demonstration: pass between the two trees"></video>
         <p class="fig-cap">Constrained traversal: the UAV flies through the narrow space between the two trees on the left.</p>
       </div>
       <div class="video-card reveal">
         <h4>Fly toward the rock formation</h4>
-        <video controls preload="none" playsinline src="assets/real_rock_formation.mp4" aria-label="Real-flight demonstration: fly toward the rock formation"></video>
+        <video controls preload="metadata" playsinline src="assets/real_rock_formation.mp4" aria-label="Real-flight demonstration: fly toward the rock formation"></video>
         <p class="fig-cap">Target-oriented navigation: the UAV flies toward the rock formation in the outdoor scene.</p>
       </div>
       <div class="video-card reveal">
         <h4>Approach the tallest blue pillar</h4>
-        <video controls preload="none" playsinline src="assets/real_blue_pillar.mp4" aria-label="Real-flight demonstration: approach the tallest blue pillar"></video>
+        <video controls preload="metadata" playsinline src="assets/real_blue_pillar.mp4" aria-label="Real-flight demonstration: approach the tallest blue pillar"></video>
         <p class="fig-cap">Object selection: the UAV flies to the front of the tallest blue pillar and stops before it.</p>
       </div>
       <div class="video-card reveal">
         <h4>Left side of the fire extinguisher</h4>
-        <video controls preload="none" playsinline src="assets/real_fire_extinguisher.mp4" aria-label="Real-flight demonstration: left side of the fire extinguisher"></video>
+        <video controls preload="metadata" playsinline src="assets/real_fire_extinguisher.mp4" aria-label="Real-flight demonstration: left side of the fire extinguisher"></video>
         <p class="fig-cap">Spatial grounding: the UAV moves to the left side of the fire extinguisher as instructed.</p>
       </div>
       <div class="video-card reveal">
         <h4>Pass through the circular frame</h4>
-        <video controls preload="none" playsinline src="assets/real_circular_frame.mp4" aria-label="Real-flight demonstration: pass through the circular frame"></video>
+        <video controls preload="metadata" playsinline src="assets/real_circular_frame.mp4" aria-label="Real-flight demonstration: pass through the circular frame"></video>
         <p class="fig-cap">Precise pass-through: the UAV crosses the circular frame ahead without contact.</p>
       </div>
       <div class="video-card reveal">
         <h4>Orbit the pillar with avoidance</h4>
-        <video controls preload="none" playsinline src="assets/real_orbit_avoid.mp4" aria-label="Real-flight demonstration: orbit the pillar with avoidance"></video>
+        <video controls preload="metadata" playsinline src="assets/real_orbit_avoid.mp4" aria-label="Real-flight demonstration: orbit the pillar with avoidance"></video>
         <p class="fig-cap">Orbit with obstacle avoidance: the UAV completes a full loop around the pillar while avoiding obstacles.</p>
       </div>
       <div class="video-card reveal">
         <h4>S-shaped trajectory flight</h4>
-        <video controls preload="none" playsinline src="assets/real_s_shape.mp4" aria-label="Real-flight demonstration: s-shaped trajectory flight"></video>
+        <video controls preload="metadata" playsinline src="assets/real_s_shape.mp4" aria-label="Real-flight demonstration: s-shaped trajectory flight"></video>
         <p class="fig-cap">Trajectory following: the UAV flies forward along an S-shaped trajectory.</p>
       </div>
     </div>
@@ -648,7 +648,7 @@ pre.bib .c{color:#7C8DB0}
     </div>
 
     <div class="figure-card wide reveal" style="margin-top:22px">
-      <img loading="lazy" src="assets/h3_latency_breakdown.pdf.png" alt="推理流水线分阶段延迟分解：NavDreamer、纯视频生成、DiffWAM、DiffWAM-Flash">
+      <img src="assets/h3_latency_breakdown.pdf.png" alt="推理流水线分阶段延迟分解：NavDreamer、纯视频生成、DiffWAM、DiffWAM-Flash">
       <p class="fig-cap"><b>分阶段延迟分解。</b> 8× H20 上：NavDreamer 10,080.2 ms、纯视频生成 8,957.8 ms、DiffWAM 3,605.5 ms、DiffWAM-Flash 835.2 ms；AGX Thor 上 Flash 为 1,080.4 ms。分解项含视觉编码、LLM 预填充、输入 / VAE 编码、视频预测计算、VAE 解码、开销与 Pi3 重建。NavDreamer 保留未来视频解码与 Pi3 重建，DiffWAM 变体省去这两个阶段。<span class="src">（图 7 · h3_latency_breakdown）</span></p>
     </div>
   </div>
